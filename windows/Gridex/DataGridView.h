@@ -2,6 +2,7 @@
 
 #include "DataGridView.g.h"
 #include "Models/QueryResult.h"
+#include "Models/ColumnInfo.h"
 #include <functional>
 
 namespace winrt::Gridex::implementation
@@ -11,6 +12,13 @@ namespace winrt::Gridex::implementation
         DataGridView();
 
         void SetData(const DBModels::QueryResult& result);
+
+        // Optional: feed full column metadata (PK / FK / nullable / full
+        // dataType string) so the header can render PK / FK icons, a
+        // tooltip with the declared type, and italicize nullable columns.
+        // Safe to omit — SetData alone still works with types from
+        // QueryResult.columnTypes but without PK/FK/nullable decoration.
+        void SetColumnMetadata(const std::vector<DBModels::ColumnInfo>& meta);
 
         // Put the grid in read-only mode (disables inline cell editing).
         // Used for adapters like Redis where the "table" is a key/value
@@ -32,6 +40,16 @@ namespace winrt::Gridex::implementation
         // Callback when user presses Delete to mark the selected row as
         // deleted (pending commit). Host routes this to DeleteSelectedRow.
         std::function<void()> OnDeleteRequested;
+
+        // Callback when user picks "Refresh" from the grid context menu —
+        // host re-runs the current tab's query to pull fresh rows.
+        std::function<void()> OnRefreshRequested;
+
+        // Callback when user clicks an FK icon in a column header — host
+        // navigates to the referenced table/schema. Arg schema may be
+        // empty; host falls back to the current connection's default.
+        std::function<void(const std::wstring& refTable,
+                           const std::wstring& refSchema)> OnForeignKeyClicked;
 
         // Get selected row data for copy
         const DBModels::TableRow* GetSelectedRow() const;
@@ -55,6 +73,7 @@ namespace winrt::Gridex::implementation
 
     private:
         DBModels::QueryResult data_;
+        std::vector<DBModels::ColumnInfo> columnMetadata_;
         int selectedRow_ = -1;
         std::wstring sortColumn_;
         bool sortAscending_ = true;

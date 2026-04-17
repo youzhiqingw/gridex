@@ -58,6 +58,47 @@ namespace winrt::Gridex::implementation
         {
             Grid_KeyDown(sender, e);
         });
+
+        // Right-click context menu. Host wires OnRefreshRequested /
+        // OnDeleteRequested in WorkspacePage; unset = no-op. Delete is
+        // disabled for read-only grids (e.g. Redis projections) and when
+        // no row is selected.
+        {
+            muxc::MenuFlyout contextMenu;
+
+            muxc::MenuFlyoutItem refreshItem;
+            refreshItem.Text(L"Refresh");
+            muxc::FontIcon refreshIcon;
+            refreshIcon.Glyph(L"\xE72C");
+            refreshItem.Icon(refreshIcon);
+            refreshItem.Click([this](auto&&, auto&&)
+            {
+                if (OnRefreshRequested) OnRefreshRequested();
+            });
+            contextMenu.Items().Append(refreshItem);
+
+            contextMenu.Items().Append(muxc::MenuFlyoutSeparator{});
+
+            muxc::MenuFlyoutItem deleteItem;
+            deleteItem.Text(L"Delete Row");
+            muxc::FontIcon deleteIcon;
+            deleteIcon.Glyph(L"\xE74D");
+            deleteItem.Icon(deleteIcon);
+            deleteItem.Click([this](auto&&, auto&&)
+            {
+                if (OnDeleteRequested) OnDeleteRequested();
+            });
+            contextMenu.Items().Append(deleteItem);
+
+            // Gate Delete on read-only mode + row selection at open time so
+            // the menu reflects the grid's actual state each right-click.
+            contextMenu.Opening([this, deleteItem](auto&&, auto&&)
+            {
+                deleteItem.IsEnabled(!readOnly_ && selectedRow_ >= 0);
+            });
+
+            this->ContextFlyout(contextMenu);
+        }
         this->Loaded([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         {
             DataScroller().ViewChanged(
@@ -96,6 +137,15 @@ namespace winrt::Gridex::implementation
                     e.Handled(true);
                 });
         });
+    }
+
+    void DataGridView::SetColumnMetadata(const std::vector<DBModels::ColumnInfo>& meta)
+    {
+        columnMetadata_ = meta;
+        // Re-render headers only if we already have data laid out;
+        // otherwise the next SetData call will pick up the metadata.
+        if (!data_.columnNames.empty())
+            BuildHeaders();
     }
 
     void DataGridView::SetData(const DBModels::QueryResult& result)
@@ -223,43 +273,96 @@ namespace winrt::Gridex::implementation
             headerBtn.BorderThickness(mux::Thickness{ 0, 0, 0, 0 });
             muxc::Grid::SetColumn(headerBtn, 0);
 
-            // Header content layout: Grid with [auto icon] [* label] [auto sort].
-            // Star column on the label means it auto-stretches to whatever
-            // space is left after the icons — when the user resizes the
-            // outer cellGrid, the label's available width tracks live via
-            // layout pass, no manual MaxWidth bookkeeping needed.
+            // Look up optional metadata (PK / FK / nullable / full type
+            // string) by column name. Header falls back gracefully if
+            // SetColumnMetadata was never called (e.g., ad-hoc query view).
+            const DBModels::ColumnInfo* meta = nullptr;
+            for (const auto& m : columnMetadata_)
+            {
+                if (m.name == colName) { meta = &m; break; }
+            }
+
+            // Resolve type string: prefer metadata (has length info like
+            // varchar(255)), else QueryResult.columnTypes.
+            std::wstring colType;
+            if (meta && !meta->dataType.empty()) colType = meta->dataType;
+            else if (ci < data_.columnTypes.size()) colType = data_.columnTypes[ci];
+
+            // Header content layout: Grid with [auto PK] [auto FK] [* label]
+            // [auto sort]. Star column on the label lets it auto-stretch to
+            // whatever space is left after the icons — when the user resizes
+            // the outer cellGrid, the label's available width tracks live
+            // via layout pass, no manual MaxWidth bookkeeping needed.
             muxc::Grid headerContent;
             {
-                muxc::ColumnDefinition iconCol, labelCol, sortCol;
-                iconCol.Width(mux::GridLength{ 0.0, mux::GridUnitType::Auto });
+                muxc::ColumnDefinition pkCol, fkCol, labelCol, sortCol;
+                pkCol.Width(mux::GridLength{ 0.0, mux::GridUnitType::Auto });
+                fkCol.Width(mux::GridLength{ 0.0, mux::GridUnitType::Auto });
                 labelCol.Width(mux::GridLength{ 1.0, mux::GridUnitType::Star });
                 sortCol.Width(mux::GridLength{ 0.0, mux::GridUnitType::Auto });
-                headerContent.ColumnDefinitions().Append(iconCol);
+                headerContent.ColumnDefinitions().Append(pkCol);
+                headerContent.ColumnDefinitions().Append(fkCol);
                 headerContent.ColumnDefinitions().Append(labelCol);
                 headerContent.ColumnDefinitions().Append(sortCol);
             }
 
-            // Column type icon at column 0
-            std::wstring colType;
-            if (ci < data_.columnTypes.size()) colType = data_.columnTypes[ci];
-            muxc::FontIcon typeIcon;
-            typeIcon.FontSize(10.0);
-            typeIcon.Opacity(0.4);
-            typeIcon.Margin(mux::Thickness{ 0.0, 0.0, 4.0, 0.0 });
-            if (colType.find(L"int") != std::wstring::npos || colType.find(L"numeric") != std::wstring::npos)
-                typeIcon.Glyph(L"\xE8EF");
-            else if (colType.find(L"bool") != std::wstring::npos)
-                typeIcon.Glyph(L"\xE73E");
-            else if (colType.find(L"time") != std::wstring::npos || colType.find(L"date") != std::wstring::npos)
-                typeIcon.Glyph(L"\xE787");
-            else
-                typeIcon.Glyph(L"\xE8C1");
-            muxc::Grid::SetColumn(typeIcon, 0);
-            headerContent.Children().Append(typeIcon);
+            // PK icon (key glyph) — gold-ish tint so it reads as a badge.
+            if (meta && meta->isPrimaryKey)
+            {
+                muxc::FontIcon pkIcon;
+                pkIcon.Glyph(L"\xE192");
+                pkIcon.FontSize(10.0);
+                pkIcon.Margin(mux::Thickness{ 0.0, 0.0, 4.0, 0.0 });
+                pkIcon.Foreground(muxm::SolidColorBrush(
+                    winrt::Windows::UI::ColorHelper::FromArgb(255, 220, 170, 40)));
+                muxc::ToolTip pkTip;
+                pkTip.Content(winrt::box_value(winrt::hstring(L"Primary Key")));
+                muxc::ToolTipService::SetToolTip(pkIcon, pkTip);
+                muxc::Grid::SetColumn(pkIcon, 0);
+                headerContent.Children().Append(pkIcon);
+            }
 
-            // Label at column 1 — fills the star column. NO MaxWidth — the
+            // FK icon (link glyph). Wrap in a button so the click jumps
+            // to the referenced table — separate from header sort click.
+            if (meta && meta->isForeignKey)
+            {
+                muxc::Button fkBtn;
+                fkBtn.Padding(mux::Thickness{ 2.0, 0.0, 2.0, 0.0 });
+                fkBtn.Margin(mux::Thickness{ 0.0, 0.0, 4.0, 0.0 });
+                fkBtn.Background(muxm::SolidColorBrush(winrt::Windows::UI::Colors::Transparent()));
+                fkBtn.BorderThickness(mux::Thickness{ 0, 0, 0, 0 });
+                fkBtn.MinWidth(0.0);
+                fkBtn.MinHeight(0.0);
+                muxc::FontIcon fkIcon;
+                fkIcon.Glyph(L"\xE71B");
+                fkIcon.FontSize(10.0);
+                fkIcon.Foreground(muxm::SolidColorBrush(
+                    winrt::Windows::UI::ColorHelper::FromArgb(255, 88, 166, 255)));
+                fkBtn.Content(fkIcon);
+
+                std::wstring refTable  = meta->fkReferencedTable;
+                std::wstring refColumn = meta->fkReferencedColumn;
+                std::wstring fkTipText = L"Foreign Key → " + refTable;
+                if (!refColumn.empty()) fkTipText += L"." + refColumn;
+                fkTipText += L"\n(click to open referenced table)";
+                muxc::ToolTip fkTip;
+                fkTip.Content(winrt::box_value(winrt::hstring(fkTipText)));
+                muxc::ToolTipService::SetToolTip(fkBtn, fkTip);
+
+                fkBtn.Click([this, refTable](auto&&, auto&&)
+                {
+                    if (OnForeignKeyClicked && !refTable.empty())
+                        OnForeignKeyClicked(refTable, L"");
+                });
+                muxc::Grid::SetColumn(fkBtn, 1);
+                headerContent.Children().Append(fkBtn);
+            }
+
+            // Label at column 2 — fills the star column. NO MaxWidth — the
             // grid layout constrains it; trimming kicks in only when the
-            // column is actually narrower than the text.
+            // column is actually narrower than the text. Nullable columns
+            // render in italics so the distinction is obvious at a glance
+            // without stealing extra header space for a separate indicator.
             muxc::TextBlock lbl;
             lbl.Text(winrt::hstring(colName));
             lbl.FontSize(11.0);
@@ -267,10 +370,40 @@ namespace winrt::Gridex::implementation
             lbl.VerticalAlignment(mux::VerticalAlignment::Center);
             lbl.TextTrimming(mux::TextTrimming::CharacterEllipsis);
             lbl.TextWrapping(mux::TextWrapping::NoWrap);
-            muxc::Grid::SetColumn(lbl, 1);
+            if (meta && meta->nullable)
+                lbl.FontStyle(winrt::Windows::UI::Text::FontStyle::Italic);
+            muxc::Grid::SetColumn(lbl, 2);
             headerContent.Children().Append(lbl);
 
-            // Sort indicator at column 2 (only if this column is the sort key)
+            // Tooltip on the whole header button summarising every piece
+            // of metadata we have — the spot users reach for when the
+            // column's declared type or constraints are not obvious.
+            {
+                std::wstring tipText;
+                if (!colType.empty()) tipText = colType;
+                if (meta)
+                {
+                    tipText += tipText.empty() ? L"" : L"\n";
+                    tipText += meta->nullable ? L"NULL" : L"NOT NULL";
+                    if (meta->isPrimaryKey) tipText += L"\nPRIMARY KEY";
+                    if (meta->isForeignKey)
+                    {
+                        tipText += L"\nFK → " + meta->fkReferencedTable;
+                        if (!meta->fkReferencedColumn.empty())
+                            tipText += L"." + meta->fkReferencedColumn;
+                    }
+                    if (!meta->defaultValue.empty())
+                        tipText += L"\nDEFAULT " + meta->defaultValue;
+                }
+                if (!tipText.empty())
+                {
+                    muxc::ToolTip headerTip;
+                    headerTip.Content(winrt::box_value(winrt::hstring(tipText)));
+                    muxc::ToolTipService::SetToolTip(headerBtn, headerTip);
+                }
+            }
+
+            // Sort indicator at column 3 (only if this column is the sort key)
             if (sortColumn_ == colName)
             {
                 muxc::FontIcon sortIcon;
@@ -278,7 +411,7 @@ namespace winrt::Gridex::implementation
                 sortIcon.Glyph(sortAscending_ ? L"\xE70E" : L"\xE70D");
                 sortIcon.Opacity(0.7);
                 sortIcon.Margin(mux::Thickness{ 4.0, 0.0, 0.0, 0.0 });
-                muxc::Grid::SetColumn(sortIcon, 2);
+                muxc::Grid::SetColumn(sortIcon, 3);
                 headerContent.Children().Append(sortIcon);
             }
 

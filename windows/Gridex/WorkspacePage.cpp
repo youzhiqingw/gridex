@@ -173,6 +173,22 @@ namespace winrt::Gridex::implementation
             DeleteSelectedRow();
         };
 
+        // Right-click → Refresh: re-run the active tab's query.
+        DataGrid().as<DataGridView>()->OnRefreshRequested = [this]()
+        {
+            ReloadCurrentTable();
+        };
+
+        // FK icon click in a header → open the referenced table. Schema
+        // arg is empty; reuse the current schema so cross-schema FKs in
+        // pg still resolve against the active search path.
+        DataGrid().as<DataGridView>()->OnForeignKeyClicked =
+            [this](const std::wstring& refTable, const std::wstring&)
+        {
+            if (!refTable.empty())
+                OnTableSelected(refTable, currentSchema_);
+        };
+
         // Wire structure view ALTER apply
         Structure().as<StructureView>()->OnApplyAlter = [this](const std::vector<std::wstring>& sqls)
         {
@@ -760,17 +776,8 @@ namespace winrt::Gridex::implementation
         SidebarToggleBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         { ToggleSidebar_Click({}, {}); });
 
-        DeleteBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
-        { DeleteSelectedRow(); });
-
-        CommitToolbarBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
-        { CommitChanges(); });
-
         DetailsToggleBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         { ToggleDetails_Click({}, {}); });
-
-        AiToggleBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
-        { ToggleAI_Click({}, {}); });
 
         DumpBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         { DumpDatabaseAsync(); });
@@ -1492,6 +1499,8 @@ namespace winrt::Gridex::implementation
                 // layer instead of lumped under a single number.
                 auto renderStart = std::chrono::steady_clock::now();
                 self->DataGrid().as<DataGridView>()->SetData(self->state_.currentData);
+                self->DataGrid().as<DataGridView>()->SetColumnMetadata(
+                    self->state_.currentColumns);
                 auto renderEnd = std::chrono::steady_clock::now();
                 self->state_.statusRenderTimeMs =
                     std::chrono::duration<double, std::milli>(renderEnd - renderStart).count();

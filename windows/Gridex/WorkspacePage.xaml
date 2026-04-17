@@ -61,8 +61,9 @@
                            Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
             </StackPanel>
 
-            <!-- Right: Delete + Commit | Details + AI -->
+            <!-- Right toolbar, grouped: [Backup] | [Schema] | [App] -->
             <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4">
+                <!-- Group 1: Backup / Restore -->
                 <Button x:Name="DumpBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
                         ToolTipService.ToolTip="Dump Database">
@@ -73,32 +74,25 @@
                         ToolTipService.ToolTip="Restore Database">
                     <FontIcon Glyph="&#xE777;" FontSize="14" />
                 </Button>
+
+                <Border Width="1" Height="20" Margin="4,0"
+                        Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                <!-- Group 2: Schema visualization -->
                 <Button x:Name="ERDiagramBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
                         ToolTipService.ToolTip="ER Diagram (current schema)">
                     <FontIcon Glyph="&#xF169;" FontSize="14" />
                 </Button>
-                <Button x:Name="DeleteBtn" Width="32" Height="32" Padding="0"
-                        Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Delete Selected Rows">
-                    <FontIcon Glyph="&#xE74D;" FontSize="14" />
-                </Button>
-                <Button x:Name="CommitToolbarBtn" Width="32" Height="32" Padding="0"
-                        Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Commit Changes">
-                    <FontIcon Glyph="&#xE73E;" FontSize="14" />
-                </Button>
+
                 <Border Width="1" Height="20" Margin="4,0"
                         Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                <!-- Group 3: UI toggles + app settings -->
                 <Button x:Name="DetailsToggleBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
                         ToolTipService.ToolTip="Toggle Details Panel">
                     <FontIcon Glyph="&#xE146;" FontSize="14" />
-                </Button>
-                <Button x:Name="AiToggleBtn" Width="32" Height="32" Padding="0"
-                        Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Toggle AI Assistant">
-                    <FontIcon Glyph="&#xE945;" FontSize="14" />
                 </Button>
                 <Button x:Name="SettingsBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"

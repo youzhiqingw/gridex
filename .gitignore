@@ -98,6 +98,10 @@ windows/Releases/
 windows/vendor/webview2/
 !windows/vendor/velopack/lib/velopack_libc_win_x64_msvc.lib
 
+# Bundled D2 CLI (Assets/d2/d2.exe) — ER Diagram uses it to render SVGs.
+# Binary is vendored so clones build + package without a manual download.
+!windows/Gridex/Assets/d2/d2.exe
+
 # Generated version header — written by build-unpackaged.ps1 -Version
 # from the CI tag, falls back to 0.0.0-dev locally via __has_include.
 windows/Gridex/GridexVersion.generated.h

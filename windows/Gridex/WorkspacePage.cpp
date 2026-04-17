@@ -173,6 +173,12 @@ namespace winrt::Gridex::implementation
             DeleteSelectedRow();
         };
 
+        // Right-click → Refresh: re-run the active tab's query.
+        DataGrid().as<DataGridView>()->OnRefreshRequested = [this]()
+        {
+            ReloadCurrentTable();
+        };
+
         // Wire structure view ALTER apply
         Structure().as<StructureView>()->OnApplyAlter = [this](const std::vector<std::wstring>& sqls)
         {
@@ -760,17 +766,8 @@ namespace winrt::Gridex::implementation
         SidebarToggleBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         { ToggleSidebar_Click({}, {}); });
 
-        DeleteBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
-        { DeleteSelectedRow(); });
-
-        CommitToolbarBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
-        { CommitChanges(); });
-
         DetailsToggleBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         { ToggleDetails_Click({}, {}); });
-
-        AiToggleBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
-        { ToggleAI_Click({}, {}); });
 
         DumpBtn().Click([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         { DumpDatabaseAsync(); });

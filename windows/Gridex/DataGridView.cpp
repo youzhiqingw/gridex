@@ -58,6 +58,47 @@ namespace winrt::Gridex::implementation
         {
             Grid_KeyDown(sender, e);
         });
+
+        // Right-click context menu. Host wires OnRefreshRequested /
+        // OnDeleteRequested in WorkspacePage; unset = no-op. Delete is
+        // disabled for read-only grids (e.g. Redis projections) and when
+        // no row is selected.
+        {
+            muxc::MenuFlyout contextMenu;
+
+            muxc::MenuFlyoutItem refreshItem;
+            refreshItem.Text(L"Refresh");
+            muxc::FontIcon refreshIcon;
+            refreshIcon.Glyph(L"\xE72C");
+            refreshItem.Icon(refreshIcon);
+            refreshItem.Click([this](auto&&, auto&&)
+            {
+                if (OnRefreshRequested) OnRefreshRequested();
+            });
+            contextMenu.Items().Append(refreshItem);
+
+            contextMenu.Items().Append(muxc::MenuFlyoutSeparator{});
+
+            muxc::MenuFlyoutItem deleteItem;
+            deleteItem.Text(L"Delete Row");
+            muxc::FontIcon deleteIcon;
+            deleteIcon.Glyph(L"\xE74D");
+            deleteItem.Icon(deleteIcon);
+            deleteItem.Click([this](auto&&, auto&&)
+            {
+                if (OnDeleteRequested) OnDeleteRequested();
+            });
+            contextMenu.Items().Append(deleteItem);
+
+            // Gate Delete on read-only mode + row selection at open time so
+            // the menu reflects the grid's actual state each right-click.
+            contextMenu.Opening([this, deleteItem](auto&&, auto&&)
+            {
+                deleteItem.IsEnabled(!readOnly_ && selectedRow_ >= 0);
+            });
+
+            this->ContextFlyout(contextMenu);
+        }
         this->Loaded([this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
         {
             DataScroller().ViewChanged(

@@ -33,6 +33,10 @@ namespace winrt::Gridex::implementation
         // deleted (pending commit). Host routes this to DeleteSelectedRow.
         std::function<void()> OnDeleteRequested;
 
+        // Callback when user picks "Refresh" from the grid context menu —
+        // host re-runs the current tab's query to pull fresh rows.
+        std::function<void()> OnRefreshRequested;
+
         // Get selected row data for copy
         const DBModels::TableRow* GetSelectedRow() const;
 

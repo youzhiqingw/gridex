@@ -366,13 +366,15 @@ namespace winrt::Gridex::implementation
                     try
                     {
                         DBModels::ConnectionManager mgr;
-                        if (!mgr.testConnection(config, config.password))
+                        std::wstring err;
+                        if (!mgr.testConnectionWithError(config, config.password, err))
                         {
+                            std::wstring msg = L"Could not connect to " + config.name + L".";
+                            if (!err.empty()) msg += L"\n\n" + err;
+                            else msg += L" Check host, port, credentials, and ensure the server is running.";
                             muxc::ContentDialog errDlg;
                             errDlg.Title(winrt::box_value(winrt::hstring(L"Connection Failed")));
-                            errDlg.Content(winrt::box_value(winrt::hstring(
-                                L"Could not connect to " + config.name +
-                                L". Check host, port, credentials, and ensure the server is running.")));
+                            errDlg.Content(winrt::box_value(winrt::hstring(msg)));
                             errDlg.CloseButtonText(L"OK");
                             errDlg.XamlRoot(this->XamlRoot());
                             errDlg.ShowAsync();
@@ -504,13 +506,15 @@ namespace winrt::Gridex::implementation
         try
         {
             DBModels::ConnectionManager mgr;
-            if (!mgr.testConnection(selectedConn, selectedConn.password))
+            std::wstring err;
+            if (!mgr.testConnectionWithError(selectedConn, selectedConn.password, err))
             {
+                std::wstring msg = L"Could not connect to " + selectedConn.name + L".";
+                if (!err.empty()) msg += L"\n\n" + err;
+                else msg += L" Check host, port, credentials, and ensure the server is running.";
                 muxc::ContentDialog errDlg;
                 errDlg.Title(winrt::box_value(winrt::hstring(L"Connection Failed")));
-                errDlg.Content(winrt::box_value(winrt::hstring(
-                    L"Could not connect to " + selectedConn.name +
-                    L". Check host, port, credentials, and ensure the server is running.")));
+                errDlg.Content(winrt::box_value(winrt::hstring(msg)));
                 errDlg.CloseButtonText(L"OK");
                 errDlg.XamlRoot(this->XamlRoot());
                 errDlg.ShowAsync();

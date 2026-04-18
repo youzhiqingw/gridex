@@ -37,6 +37,15 @@ namespace DBModels
             const ConnectionConfig& config,
             const std::wstring& password);
 
+        // Same as testConnection but surfaces the underlying adapter
+        // error message (libpq / libmariadb / sqlite3 text) so UI can
+        // show the real reason instead of a generic "check host/port"
+        // line. outError stays empty when the call returns true.
+        bool testConnectionWithError(
+            const ConnectionConfig& config,
+            const std::wstring& password,
+            std::wstring& outError);
+
         // Get the active adapter (nullptr if not connected)
         std::shared_ptr<DatabaseAdapter> getActiveAdapter() const { return activeAdapter_; }
 

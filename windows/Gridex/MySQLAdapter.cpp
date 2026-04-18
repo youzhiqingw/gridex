@@ -83,18 +83,84 @@ namespace DBModels
         // Set UTF-8
         mysql_options(conn_, MYSQL_SET_CHARSET_NAME, "utf8mb4");
 
-        // SSL — respect sslMode: Preferred/Required skip cert verification
-        // (common for self-signed certs); VerifyCA/VerifyIdentity enforce it.
-        if (config.sslMode != DBModels::SSLMode::Disabled)
+        // Point libmariadb at the bundled auth plugin DLLs. Without this
+        // the library looks for plugins in a compile-time vcpkg path
+        // that doesn't exist on customer machines → any auth method
+        // beyond the built-in mysql_native_password (e.g. MySQL 8's
+        // default caching_sha2_password, MariaDB's client_ed25519)
+        // fails with "Authentication plugin '...' cannot be loaded".
+        // Plugins are copied to <exe_dir>/plugins/mariadb/ by
+        // build-unpackaged.ps1.
         {
-            mysql_ssl_set(conn_, nullptr, nullptr, nullptr, nullptr, nullptr);
+            wchar_t exePath[MAX_PATH] = {};
+            DWORD len = ::GetModuleFileNameW(nullptr, exePath, MAX_PATH);
+            if (len > 0 && len < MAX_PATH)
+            {
+                std::wstring dir(exePath);
+                auto slash = dir.find_last_of(L"\\/");
+                if (slash != std::wstring::npos) dir.resize(slash);
+                std::wstring pluginDirW = dir + L"\\plugins\\mariadb";
+                auto pluginDir = toUtf8(pluginDirW);
+                mysql_options(conn_, MYSQL_PLUGIN_DIR, pluginDir.c_str());
+            }
+        }
+
+        // SSL policy.
+        //
+        // MariaDB Connector/C 3.4 (vcpkg build) auto-upgrades the
+        // connection to TLS whenever the server advertises CLIENT_SSL —
+        // even if the caller never touched any SSL option. The client's
+        // default cert-verify flag is TRUE, so a self-signed / untrusted
+        // server cert then bombs with "Certificate verification failure:
+        // The certificate is NOT trusted", turning what the user picked
+        // as "Disabled" into a verification failure instead of a plain
+        // TCP connect. macOS MySQLNIO doesn't have this auto-upgrade so
+        // the same server works there with Disabled.
+        //
+        // Pragmatic fix: always disable cert verification UNLESS the
+        // user explicitly picked VerifyCA / VerifyIdentity. That covers
+        // Disabled (may or may not get SSL silently, but won't fail on
+        // cert), Preferred, and Required.
+        {
+            bool wantSSL =
+                (config.sslMode != DBModels::SSLMode::Disabled);
+            unsigned char enforce = wantSSL ? 1 : 0;
+            mysql_options(conn_, MYSQL_OPT_SSL_ENFORCE, &enforce);
 
             bool verifyCert =
                 (config.sslMode == DBModels::SSLMode::VerifyCA ||
                  config.sslMode == DBModels::SSLMode::VerifyIdentity);
             unsigned char verify = verifyCert ? 1 : 0;
             mysql_options(conn_, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, &verify);
+
+            if (wantSSL)
+            {
+                mysql_ssl_set(conn_, nullptr, nullptr, nullptr, nullptr, nullptr);
+            }
         }
+
+        // MariaDB Connector/C 3.4+ defaults its restricted_auth list to
+        // a subset that on some vcpkg builds **excludes**
+        // mysql_native_password — the most common MySQL auth plugin and
+        // the one MySQLNIO (macOS Gridex) has no problem with. On
+        // Windows this caused "Authentication plugin 'mysql_native_password'
+        // couldn't be found in restricted_auth plugin list." whenever a
+        // server's user account wasn't on caching_sha2_password.
+        //
+        // NOTE: passing "" would mean "whitelist = nothing" → block
+        // every plugin, which is worse. Pass an explicit whitelist
+        // covering every plugin libmariadb supports and that real
+        // servers actually use. Mirrors the mysql CLI behaviour.
+        static const char* kAllowedAuthPlugins =
+            "mysql_native_password,"
+            "caching_sha2_password,"
+            "sha256_password,"
+            "mysql_clear_password,"
+            "dialog,"
+            "auth_gssapi_client,"
+            "client_ed25519";
+        mysql_optionsv(conn_, MARIADB_OPT_RESTRICTED_AUTH,
+                       (void*)kAllowedAuthPlugins);
 
         auto host = toUtf8(config.host);
         auto user = toUtf8(config.username);
@@ -478,12 +544,23 @@ namespace DBModels
         bool first = true;
         for (auto& [col, val] : values)
         {
+            // Blank cell (user left it empty in the new-row UI) → omit the
+            // column so DB defaults / AUTO_INCREMENT / NULL-by-default kick
+            // in. MySQL otherwise rejects '' for INT columns. Users who
+            // actually want SQL NULL get the null sentinel, which is kept
+            // below and emitted as NULL.
+            if (!isNullCell(val) && val.empty()) continue;
             if (!first) { sql += ", "; valsSql += ", "; }
             sql += quoteIdentifier(col);
             valsSql += isNullCell(val) ? "NULL" : quoteLiteral(val);
             first = false;
         }
-        sql += ") VALUES (" + valsSql + ")";
+        // All columns blank → use MySQL's all-defaults insert form so we
+        // don't produce invalid "INSERT INTO t () VALUES ()".
+        if (first)
+            sql = "INSERT INTO " + quoteIdentifier(schema) + "." + quoteIdentifier(table) + " () VALUES ()";
+        else
+            sql += ") VALUES (" + valsSql + ")";
         return executeInternal(sql);
     }
 

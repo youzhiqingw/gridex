@@ -92,6 +92,45 @@ namespace DBModels
         return ok;
     }
 
+    bool ConnectionManager::testConnectionWithError(
+        const ConnectionConfig& config,
+        const std::wstring& password,
+        std::wstring& outError)
+    {
+        outError.clear();
+
+        std::unique_ptr<SSHTunnelService> testTunnel;
+        auto effectiveConfig = applySSHTunnel(config, password, testTunnel);
+
+        auto adapter = createAdapter(config.databaseType);
+
+        // Call adapter->connect directly instead of the bool
+        // testConnection shortcut: connect() throws DatabaseError with
+        // the driver's own message, which is exactly what we want to
+        // surface in the UI.
+        bool ok = false;
+        try
+        {
+            adapter->connect(effectiveConfig, password);
+            auto result = adapter->execute(L"SELECT 1");
+            adapter->disconnect();
+            ok = result.success;
+            if (!ok) outError = result.error;
+        }
+        catch (const std::exception& e)
+        {
+            const std::string w = e.what();
+            outError.assign(w.begin(), w.end());
+        }
+        catch (...)
+        {
+            outError = L"Unknown error";
+        }
+
+        if (testTunnel) testTunnel->close();
+        return ok;
+    }
+
     std::shared_ptr<DatabaseAdapter> ConnectionManager::createAdapter(DatabaseType type)
     {
         switch (type)

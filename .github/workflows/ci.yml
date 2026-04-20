@@ -59,7 +59,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           & 'C:\vcpkg\vcpkg.exe' install `
             sqlite3 libpq libmariadb openssl hiredis `
-            nlohmann-json cpp-httplib libssh2 mongocxx bsoncxx `
+            nlohmann-json cpp-httplib libssh2 mongo-cxx-driver `
             --triplet x64-windows
 
       - name: Build unpackaged exe

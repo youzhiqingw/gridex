@@ -26,7 +26,7 @@
 
                 <!-- Row 0: Name + Group -->
                 <TextBlock Grid.Row="0" Grid.Column="0"
-                           Text="Name"
+                           Text="名称"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
@@ -38,19 +38,19 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="NameInput" Grid.Column="0"
-                             PlaceholderText="My Database" />
-                    <TextBlock Grid.Column="1" Text="Group"
+                             PlaceholderText="我的数据库" />
+                    <TextBlock Grid.Column="1" Text="分组"
                                VerticalAlignment="Center"
                                Margin="12,0,8,0"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <ComboBox x:Name="GroupCombo" Grid.Column="2"
                               MinWidth="160"
-                              PlaceholderText="(None)" />
+                              PlaceholderText="（无）" />
                 </Grid>
 
                 <!-- Row 1: Status Color + Tag -->
                 <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="Status color"
+                           Text="状态颜色"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
@@ -64,19 +64,19 @@
                     <StackPanel x:Name="ColorTagPicker" Grid.Column="0"
                                 Orientation="Horizontal" Spacing="6"
                                 VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="1" Text="Tag"
+                    <TextBlock Grid.Column="1" Text="标签"
                                VerticalAlignment="Center"
                                Margin="16,0,8,0"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <ComboBox x:Name="TagCombo" Grid.Column="2"
                               MinWidth="120"
                               SelectedIndex="0">
-                        <ComboBoxItem Content="None" />
-                        <ComboBoxItem Content="Production" />
-                        <ComboBoxItem Content="Staging" />
-                        <ComboBoxItem Content="Development" />
-                        <ComboBoxItem Content="Testing" />
-                        <ComboBoxItem Content="Local" />
+                        <ComboBoxItem Content="无" />
+                        <ComboBoxItem Content="生产" />
+                        <ComboBoxItem Content="预发布" />
+                        <ComboBoxItem Content="开发" />
+                        <ComboBoxItem Content="测试" />
+                        <ComboBoxItem Content="本地" />
                     </ComboBox>
                 </Grid>
 
@@ -92,14 +92,14 @@
                             Visibility="Collapsed" x:Name="MongoUriSection"
                             Margin="0,0,0,12">
                     <TextBox x:Name="UriInput"
-                             PlaceholderText="mongodb://user:pass@host:27017/db  (optional, overrides fields below)" />
+                             PlaceholderText="mongodb://user:pass@host:27017/db（可选，覆盖下方字段）" />
                     <TextBox x:Name="MongoOptionsInput"
-                             PlaceholderText="authSource=admin&amp;replicaSet=rs0&amp;tls=true  (optional)" />
+                             PlaceholderText="authSource=admin&amp;replicaSet=rs0&amp;tls=true（可选）" />
                 </StackPanel>
 
                 <!-- Row 3: Host/Socket + Port -->
                 <TextBlock x:Name="HostLabel" Grid.Row="3" Grid.Column="0"
-                           Text="Host/Socket"
+                           Text="主机/Socket"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
@@ -112,7 +112,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="HostInput" Grid.Column="0"
                              PlaceholderText="127.0.0.1" />
-                    <TextBlock Grid.Column="1" Text="Port"
+                    <TextBlock Grid.Column="1" Text="端口"
                                VerticalAlignment="Center"
                                Margin="12,0,8,0"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -125,7 +125,7 @@
 
                 <!-- Row 4: User + Other Options -->
                 <TextBlock x:Name="UserLabel" Grid.Row="4" Grid.Column="0"
-                           Text="User"
+                           Text="用户"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
@@ -137,14 +137,14 @@
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="UserInput" Grid.Column="0"
                              PlaceholderText="postgres" />
-                    <Button Grid.Column="1" Content="Other options"
+                    <Button Grid.Column="1" Content="其他选项"
                             Margin="8,0,0,0"
                             VerticalAlignment="Stretch" />
                 </Grid>
 
                 <!-- Row 5: Password + Store in keychain -->
                 <TextBlock x:Name="PasswordLabel" Grid.Row="5" Grid.Column="0"
-                           Text="Password"
+                           Text="密码"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
@@ -155,19 +155,19 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <PasswordBox x:Name="PasswordInput" Grid.Column="0"
-                                 PlaceholderText="Enter password" />
+                                 PlaceholderText="输入密码" />
                     <ComboBox Grid.Column="1"
                               Margin="8,0,0,0"
                               SelectedIndex="0"
                               MinWidth="140">
-                        <ComboBoxItem Content="Store in keychain" />
-                        <ComboBoxItem Content="Don't store" />
+                        <ComboBoxItem Content="保存到钥匙串" />
+                        <ComboBoxItem Content="不保存" />
                     </ComboBox>
                 </Grid>
 
                 <!-- Row 6: Database + SSL mode -->
                 <TextBlock Grid.Row="6" Grid.Column="0"
-                           Text="Database"
+                           Text="数据库"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
@@ -180,33 +180,33 @@
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="DatabaseInput" Grid.Column="0"
                              PlaceholderText="mydb" />
-                    <TextBlock Grid.Column="1" Text="SSL mode"
+                    <TextBlock Grid.Column="1" Text="SSL 模式"
                                VerticalAlignment="Center"
                                Margin="12,0,8,0"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     <ComboBox x:Name="SslModeInput" Grid.Column="2"
                               MinWidth="130"
                               SelectedIndex="0">
-                        <ComboBoxItem Content="Preferred" />
-                        <ComboBoxItem Content="Disabled" />
-                        <ComboBoxItem Content="Required" />
-                        <ComboBoxItem Content="Verify CA" />
-                        <ComboBoxItem Content="Verify Identity" />
+                        <ComboBoxItem Content="优先" />
+                        <ComboBoxItem Content="禁用" />
+                        <ComboBoxItem Content="必需" />
+                        <ComboBoxItem Content="验证 CA" />
+                        <ComboBoxItem Content="验证身份" />
                     </ComboBox>
                 </Grid>
 
                 <!-- Row 7: SSL Keys -->
                 <TextBlock x:Name="SslKeysLabel" Grid.Row="7" Grid.Column="0"
-                           Text="SSL keys"
+                           Text="SSL 密钥"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 <StackPanel x:Name="SslKeysRow" Grid.Row="7" Grid.Column="1"
                             Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
-                    <Button Content="Key..." MinWidth="80" />
-                    <Button Content="Cert..." MinWidth="80" />
-                    <Button Content="CA Cert..." MinWidth="80" />
+                    <Button Content="密钥..." MinWidth="80" />
+                    <Button Content="证书..." MinWidth="80" />
+                    <Button Content="CA 证书..." MinWidth="80" />
                     <Button Width="32" Padding="0">
                         <FontIcon Glyph="&#xE738;" FontSize="12" />
                     </Button>
@@ -214,7 +214,7 @@
 
                 <!-- Row 8: SQLite File Path (shown only for SQLite) -->
                 <TextBlock x:Name="FileLabel" Grid.Row="8" Grid.Column="0"
-                           Text="Database File"
+                           Text="数据库文件"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            Margin="0,0,16,0"
@@ -228,7 +228,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="FilePathInput" Grid.Column="0"
                              PlaceholderText="path/to/database.db" />
-                    <Button Content="Browse..." Grid.Column="1"
+                    <Button Content="浏览..." Grid.Column="1"
                             Margin="8,0,0,0"
                             Click="BrowseFile_Click" />
                 </Grid>
@@ -240,7 +240,7 @@
                             Padding="16"
                             CornerRadius="8"
                             Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
-                    <TextBlock Text="SSH TUNNEL" FontSize="11" FontWeight="SemiBold"
+                    <TextBlock Text="SSH 隧道" FontSize="11" FontWeight="SemiBold"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                Margin="0,0,0,12" />
                     <Grid>
@@ -256,7 +256,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="SSH Host"
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="SSH 主机"
                                    VerticalAlignment="Center" HorizontalAlignment="Right"
                                    Margin="0,0,12,0"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -268,7 +268,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBox x:Name="SshHostInput" Grid.Column="0"
                                      PlaceholderText="ssh.example.com" />
-                            <TextBlock Grid.Column="1" Text="Port"
+                            <TextBlock Grid.Column="1" Text="端口"
                                        VerticalAlignment="Center" Margin="12,0,8,0"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             <NumberBox x:Name="SshPortInput" Grid.Column="2"
@@ -276,14 +276,14 @@
                                        MinWidth="80" />
                         </Grid>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Username"
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="用户名"
                                    VerticalAlignment="Center" HorizontalAlignment="Right"
                                    Margin="0,0,12,0"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <TextBox x:Name="SshUserInput" Grid.Row="1" Grid.Column="1"
                                  PlaceholderText="user" Margin="0,0,0,10" />
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Auth"
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="认证方式"
                                    VerticalAlignment="Center" HorizontalAlignment="Right"
                                    Margin="0,0,12,0"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -291,19 +291,19 @@
                                   HorizontalAlignment="Stretch" SelectedIndex="0"
                                   Margin="0,0,0,10"
                                   SelectionChanged="SshAuth_Changed">
-                            <ComboBoxItem Content="Password" />
-                            <ComboBoxItem Content="Private Key" />
-                            <ComboBoxItem Content="Key + Passphrase" />
+                            <ComboBoxItem Content="密码" />
+                            <ComboBoxItem Content="私钥" />
+                            <ComboBoxItem Content="密钥 + 口令" />
                         </ComboBox>
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Password"
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="密码"
                                    VerticalAlignment="Center" HorizontalAlignment="Right"
                                    Margin="0,0,12,0"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <PasswordBox x:Name="SshPasswordInput" Grid.Row="3" Grid.Column="1"
-                                     PlaceholderText="SSH password" Margin="0,0,0,10" />
+                                     PlaceholderText="SSH 密码" Margin="0,0,0,10" />
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Key file"
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="密钥文件"
                                    VerticalAlignment="Center" HorizontalAlignment="Right"
                                    Margin="0,0,12,0"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -315,7 +315,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBox x:Name="SshKeyInput" Grid.Column="0"
                                      PlaceholderText="~/.ssh/id_rsa" />
-                            <Button Content="Browse..." Grid.Column="1"
+                            <Button Content="浏览..." Grid.Column="1"
                                     Margin="8,0,0,0"
                                     Click="BrowseSshKey_Click" />
                         </Grid>
@@ -324,7 +324,7 @@
             </Grid>
         </ScrollViewer>
 
-        <!-- Bottom Action Bar (matches macOS: Over SSH | Save | Test | Connect) -->
+                <!-- Bottom Action Bar (matches macOS: 通过 SSH | 保存 | 测试 | 连接) -->
         <Border BorderThickness="0,1,0,0"
                 BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                 Margin="0,12,0,0"
@@ -339,17 +339,17 @@
                 </Grid.ColumnDefinitions>
 
                 <ToggleButton x:Name="SshToggle" Grid.Column="0"
-                              Content="Over SSH"
+                          Content="通过 SSH"
                               Click="SshToggle_Click" />
 
                 <Button x:Name="SaveButton" Grid.Column="2"
-                        Content="Save" Margin="0,0,8,0"
+                    Content="保存" Margin="0,0,8,0"
                         Click="SaveButton_Click" />
                 <Button x:Name="TestButton" Grid.Column="3"
-                        Content="Test" Margin="0,0,8,0"
+                    Content="测试" Margin="0,0,8,0"
                         Click="TestButton_Click" />
                 <Button x:Name="ConnectButton" Grid.Column="4"
-                        Content="Connect"
+                    Content="连接"
                         Style="{StaticResource AccentButtonStyle}"
                         Click="ConnectButton_Click" />
             </Grid>

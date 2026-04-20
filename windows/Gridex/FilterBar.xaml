@@ -18,31 +18,31 @@
 
         <!-- Column picker -->
         <ComboBox Grid.Column="0" x:Name="ColumnPicker"
-                  PlaceholderText="Column"
+                  PlaceholderText="列"
                   MinWidth="140" Height="28" FontSize="12" />
 
         <!-- Operator picker -->
         <ComboBox Grid.Column="1" x:Name="OperatorPicker"
                   Margin="6,0,0,0" MinWidth="120" Height="28" FontSize="12">
-            <ComboBoxItem Content="equals" IsSelected="True" />
-            <ComboBoxItem Content="not equals" />
-            <ComboBoxItem Content="contains" />
-            <ComboBoxItem Content="starts with" />
-            <ComboBoxItem Content="is null" />
-            <ComboBoxItem Content="is not null" />
+            <ComboBoxItem Content="等于" IsSelected="True" />
+            <ComboBoxItem Content="不等于" />
+            <ComboBoxItem Content="包含" />
+            <ComboBoxItem Content="以...开头" />
+            <ComboBoxItem Content="为空" />
+            <ComboBoxItem Content="不为空" />
         </ComboBox>
 
         <!-- Value input -->
         <TextBox Grid.Column="2" x:Name="FilterValue"
                  Margin="6,0,0,0" MinWidth="180" Height="28"
-                 FontSize="12" PlaceholderText="Value..." />
+                 FontSize="12" PlaceholderText="值..." />
 
-        <!-- Apply / Clear -->
+        <!-- 应用 / 清空 -->
         <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6">
-            <Button Content="Apply" Padding="10,4" FontSize="12"
+            <Button Content="应用" Padding="10,4" FontSize="12"
                     Style="{StaticResource AccentButtonStyle}"
                     Click="ApplyFilter_Click" />
-            <Button Content="Clear" Padding="10,4" FontSize="12"
+            <Button Content="清空" Padding="10,4" FontSize="12"
                     Click="ClearFilter_Click" />
         </StackPanel>
     </Grid>

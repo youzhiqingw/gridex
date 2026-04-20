@@ -60,7 +60,7 @@ namespace winrt::Gridex::implementation
         {
             DBModels::ConnectionManager mgr;
             success = mgr.testConnection(config, password);
-            if (!success) errorMsg = L"Connection test returned false.";
+            if (!success) errorMsg = L"连接测试返回 false。";
         }
         catch (const DBModels::DatabaseError& ex)
         {
@@ -73,11 +73,11 @@ namespace winrt::Gridex::implementation
                 if (!errorMsg.empty() && errorMsg.back() == L'\0') errorMsg.pop_back();
             }
         }
-        catch (...) { errorMsg = L"Unknown error"; }
+        catch (...) { errorMsg = L"未知错误"; }
 
-        std::wstring title = success ? L"Connection Successful" : L"Connection Failed";
+        std::wstring title = success ? L"连接成功" : L"连接失败";
         std::wstring text  = success
-            ? (L"Successfully connected to " + config.host)
+            ? (L"已成功连接到 " + config.host)
             : errorMsg;
 
         HWND owner = winrt::Gridex::implementation::App::MainHwnd;
@@ -97,14 +97,14 @@ namespace winrt::Gridex::implementation
         // Show ConnectionFormDialog pre-filled with existing values
         muxc::ContentDialog formDialog;
         formDialog.Title(winrt::box_value(winrt::hstring(
-            L"Edit " + DBModels::DatabaseTypeDisplayName(existing.databaseType) +
-            L" Connection")));
+            L"编辑 " + DBModels::DatabaseTypeDisplayName(existing.databaseType) +
+            L" 连接")));
         auto form = winrt::make<ConnectionFormDialog>();
         auto formImpl = form.as<ConnectionFormDialog>();
         formImpl->SetDatabaseType(existing.databaseType);
         formImpl->SetConnectionConfig(existing);
         formDialog.Content(form);
-        formDialog.CloseButtonText(L"Cancel");
+        formDialog.CloseButtonText(L"取消");
         formDialog.XamlRoot(this->XamlRoot());
         formDialog.Resources().Insert(
             winrt::box_value(L"ContentDialogMaxWidth"),
@@ -231,7 +231,7 @@ namespace winrt::Gridex::implementation
                 int ungroupedCount = 0;
                 for (const auto& conn : allConnections_)
                     if (conn.group.empty() && matches(conn)) ungroupedCount++;
-                AddGroupHeader(L"Ungrouped", ungroupedCount);
+                AddGroupHeader(L"未分组", ungroupedCount);
             }
             for (const auto& conn : allConnections_)
                 if (conn.group.empty() && matches(conn))
@@ -292,10 +292,10 @@ namespace winrt::Gridex::implementation
     void HomePage::ShowNewConnectionFlow()
     {
         muxc::ContentDialog typeDialog;
-        typeDialog.Title(winrt::box_value(winrt::hstring(L"New Connection")));
+        typeDialog.Title(winrt::box_value(winrt::hstring(L"新建连接")));
         auto picker = winrt::make<DatabaseTypePickerDialog>();
         typeDialog.Content(picker);
-        typeDialog.CloseButtonText(L"Cancel");
+        typeDialog.CloseButtonText(L"取消");
         typeDialog.XamlRoot(this->XamlRoot());
 
         auto pickerImpl = picker.as<DatabaseTypePickerDialog>();
@@ -305,12 +305,12 @@ namespace winrt::Gridex::implementation
 
             muxc::ContentDialog formDialog;
             formDialog.Title(winrt::box_value(winrt::hstring(
-                DBModels::DatabaseTypeDisplayName(type) + L" Connection")));
+                DBModels::DatabaseTypeDisplayName(type) + L" 连接")));
             auto form = winrt::make<ConnectionFormDialog>();
             auto formImpl = form.as<ConnectionFormDialog>();
             formImpl->SetDatabaseType(type);
             formDialog.Content(form);
-            formDialog.CloseButtonText(L"Cancel");
+            formDialog.CloseButtonText(L"取消");
             formDialog.XamlRoot(this->XamlRoot());
             // Ensure dialog is wide enough for the form
             formDialog.Resources().Insert(
@@ -369,13 +369,13 @@ namespace winrt::Gridex::implementation
                         std::wstring err;
                         if (!mgr.testConnectionWithError(config, config.password, err))
                         {
-                            std::wstring msg = L"Could not connect to " + config.name + L".";
+                            std::wstring msg = L"无法连接到 " + config.name + L"。";
                             if (!err.empty()) msg += L"\n\n" + err;
-                            else msg += L" Check host, port, credentials, and ensure the server is running.";
+                            else msg += L" 请检查主机、端口和凭据，并确保服务器正在运行。";
                             muxc::ContentDialog errDlg;
-                            errDlg.Title(winrt::box_value(winrt::hstring(L"Connection Failed")));
+                            errDlg.Title(winrt::box_value(winrt::hstring(L"连接失败")));
                             errDlg.Content(winrt::box_value(winrt::hstring(msg)));
-                            errDlg.CloseButtonText(L"OK");
+                            errDlg.CloseButtonText(L"确定");
                             errDlg.XamlRoot(this->XamlRoot());
                             errDlg.ShowAsync();
                             return;
@@ -404,12 +404,12 @@ namespace winrt::Gridex::implementation
     winrt::fire_and_forget HomePage::ShowNewGroupDialogAsync()
     {
         muxc::ContentDialog dialog;
-        dialog.Title(winrt::box_value(winrt::hstring(L"New Group")));
+        dialog.Title(winrt::box_value(winrt::hstring(L"新建分组")));
         muxc::TextBox input;
-        input.PlaceholderText(L"Group name");
+        input.PlaceholderText(L"分组名称");
         dialog.Content(input);
-        dialog.PrimaryButtonText(L"Create");
-        dialog.CloseButtonText(L"Cancel");
+        dialog.PrimaryButtonText(L"创建");
+        dialog.CloseButtonText(L"取消");
         dialog.DefaultButton(muxc::ContentDialogButton::Primary);
         dialog.XamlRoot(this->XamlRoot());
 
@@ -509,13 +509,13 @@ namespace winrt::Gridex::implementation
             std::wstring err;
             if (!mgr.testConnectionWithError(selectedConn, selectedConn.password, err))
             {
-                std::wstring msg = L"Could not connect to " + selectedConn.name + L".";
+                std::wstring msg = L"无法连接到 " + selectedConn.name + L"。";
                 if (!err.empty()) msg += L"\n\n" + err;
-                else msg += L" Check host, port, credentials, and ensure the server is running.";
+                else msg += L" 请检查主机、端口和凭据，并确保服务器正在运行。";
                 muxc::ContentDialog errDlg;
-                errDlg.Title(winrt::box_value(winrt::hstring(L"Connection Failed")));
+                errDlg.Title(winrt::box_value(winrt::hstring(L"连接失败")));
                 errDlg.Content(winrt::box_value(winrt::hstring(msg)));
-                errDlg.CloseButtonText(L"OK");
+                errDlg.CloseButtonText(L"确定");
                 errDlg.XamlRoot(this->XamlRoot());
                 errDlg.ShowAsync();
                 return;

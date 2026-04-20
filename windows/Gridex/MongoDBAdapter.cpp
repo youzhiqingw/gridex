@@ -345,19 +345,19 @@ namespace DBModels
         // BSON type codes: https://bsonspec.org/spec.html
         switch (bsonType)
         {
-        case 1:  return L"Double";
-        case 2:  return L"String";
-        case 3:  return L"Object";
-        case 4:  return L"Array";
-        case 5:  return L"Binary";
-        case 7:  return L"ObjectId";
-        case 8:  return L"Boolean";
-        case 9:  return L"Date";
-        case 10: return L"Null";
+        case 1:  return L"双精度";
+        case 2:  return L"字符串";
+        case 3:  return L"对象";
+        case 4:  return L"数组";
+        case 5:  return L"二进制";
+        case 7:  return L"对象 ID";
+        case 8:  return L"布尔值";
+        case 9:  return L"日期";
+        case 10: return L"空值";
         case 16: return L"Int32";
         case 18: return L"Int64";
         case 19: return L"Decimal128";
-        default: return L"Unknown";
+        default: return L"未知";
         }
     }
 
@@ -502,7 +502,7 @@ namespace DBModels
                 return fromUtf8(std::string(ver.get_string().value));
         }
         catch (...) {}
-        return L"Unknown";
+        return L"未知";
     }
 
     std::wstring MongoDBAdapter::currentDatabase()

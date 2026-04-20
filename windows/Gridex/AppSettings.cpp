@@ -319,6 +319,8 @@ namespace DBModels
 
         s.themeIndex         = extractInt(json, L"themeIndex", 0);
         s.aiProviderIndex    = extractInt(json, L"aiProviderIndex", 0);
+        s.anthropicEndpoint  = extractString(json, L"anthropicEndpoint");
+        s.openaiEndpoint     = extractString(json, L"openaiEndpoint");
         s.aiApiKey           = extractString(json, L"aiApiKey");
         s.aiModel            = extractString(json, L"aiModel");
         s.ollamaEndpoint     = extractString(json, L"ollamaEndpoint");
@@ -340,6 +342,8 @@ namespace DBModels
         ss << L"{\n";
         ss << L"  \"themeIndex\": "          << themeIndex          << L",\n";
         ss << L"  \"aiProviderIndex\": "     << aiProviderIndex     << L",\n";
+        ss << L"  \"anthropicEndpoint\": \"" << escapeJson(anthropicEndpoint) << L"\",\n";
+        ss << L"  \"openaiEndpoint\": \""    << escapeJson(openaiEndpoint)    << L"\",\n";
         ss << L"  \"aiApiKey\": \""          << escapeJson(aiApiKey)          << L"\",\n";
         ss << L"  \"aiModel\": \""           << escapeJson(aiModel)           << L"\",\n";
         ss << L"  \"ollamaEndpoint\": \""    << escapeJson(ollamaEndpoint)    << L"\",\n";

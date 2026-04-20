@@ -83,7 +83,7 @@ namespace winrt::Gridex::implementation
         ItemsContent().Visibility(mux::Visibility::Visible);
         QueriesContent().Visibility(mux::Visibility::Collapsed);
         HistoryContent().Visibility(mux::Visibility::Collapsed);
-        SearchBox().PlaceholderText(L"Search for item...");
+        SearchBox().PlaceholderText(L"搜索项目...");
     }
     void SidebarPanel::QueriesTab_Click(
         winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
@@ -94,13 +94,13 @@ namespace winrt::Gridex::implementation
         ItemsContent().Visibility(mux::Visibility::Collapsed);
         QueriesContent().Visibility(mux::Visibility::Visible);
         HistoryContent().Visibility(mux::Visibility::Collapsed);
-        SearchBox().PlaceholderText(L"Search queries...");
+        SearchBox().PlaceholderText(L"搜索查询...");
 
         // Show placeholder if empty
         if (QueriesContainer().Children().Size() == 0)
         {
             muxc::TextBlock placeholder;
-            placeholder.Text(L"No saved queries yet");
+            placeholder.Text(L"还没有已保存的查询");
             placeholder.FontSize(12.0);
             placeholder.Opacity(0.4);
             placeholder.HorizontalAlignment(mux::HorizontalAlignment::Center);
@@ -117,7 +117,7 @@ namespace winrt::Gridex::implementation
         ItemsContent().Visibility(mux::Visibility::Collapsed);
         QueriesContent().Visibility(mux::Visibility::Collapsed);
         HistoryContent().Visibility(mux::Visibility::Visible);
-        SearchBox().PlaceholderText(L"Search history...");
+        SearchBox().PlaceholderText(L"搜索历史...");
     }
 
     void SidebarPanel::SetHistory(const std::vector<std::pair<std::wstring, std::wstring>>& entries)
@@ -127,7 +127,7 @@ namespace winrt::Gridex::implementation
         if (entries.empty())
         {
             muxc::TextBlock placeholder;
-            placeholder.Text(L"No query history");
+            placeholder.Text(L"没有查询历史");
             placeholder.FontSize(12.0);
             placeholder.Opacity(0.4);
             placeholder.HorizontalAlignment(mux::HorizontalAlignment::Center);
@@ -337,7 +337,7 @@ namespace winrt::Gridex::implementation
                 // Browse Keys - opens pattern input dialog (Ctrl+F style),
                 // then loads Keys table filtered by SCAN MATCH pattern
                 muxc::MenuFlyoutItem browseItem;
-                browseItem.Text(L"Browse Keys...");
+                browseItem.Text(L"浏览键...");
                 browseItem.Icon(muxc::FontIcon());
                 browseItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE721");  // Search
                 browseItem.Click([this](auto&&, auto&&)
@@ -346,7 +346,7 @@ namespace winrt::Gridex::implementation
 
                 // Copy Name (still useful — table name = "Keys")
                 muxc::MenuFlyoutItem copyItem;
-                copyItem.Text(L"Copy Name");
+                copyItem.Text(L"复制名称");
                 copyItem.Icon(muxc::FontIcon());
                 copyItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE8C8");
                 copyItem.Click([tblName](auto&&, auto&&)
@@ -361,7 +361,7 @@ namespace winrt::Gridex::implementation
 
                 // Refresh — re-list keys from server
                 muxc::MenuFlyoutItem refreshItem;
-                refreshItem.Text(L"Refresh");
+                refreshItem.Text(L"刷新");
                 refreshItem.Icon(muxc::FontIcon());
                 refreshItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE72C");
                 refreshItem.Click([this](auto&&, auto&&)
@@ -372,7 +372,7 @@ namespace winrt::Gridex::implementation
 
                 // Flush Database - destructive, host shows confirmation
                 muxc::MenuFlyoutItem flushItem;
-                flushItem.Text(L"Flush Database...");
+                flushItem.Text(L"清空数据库...");
                 flushItem.Icon(muxc::FontIcon());
                 flushItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE74D");
                 flushItem.Click([this](auto&&, auto&&)
@@ -386,7 +386,7 @@ namespace winrt::Gridex::implementation
                 // ── SQL DB menu (Postgres / MySQL / SQLite) ──
                 // Open
                 muxc::MenuFlyoutItem openItem;
-                openItem.Text(L"Open");
+                openItem.Text(L"打开");
                 openItem.Icon(muxc::FontIcon());
                 openItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE8A7");
                 openItem.Click([this, capturedItem](auto&&, auto&&)
@@ -395,7 +395,7 @@ namespace winrt::Gridex::implementation
 
                 // Copy Name
                 muxc::MenuFlyoutItem copyItem;
-                copyItem.Text(L"Copy Name");
+                copyItem.Text(L"复制名称");
                 copyItem.Icon(muxc::FontIcon());
                 copyItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE8C8");
                 copyItem.Click([tblName](auto&&, auto&&)
@@ -410,7 +410,7 @@ namespace winrt::Gridex::implementation
 
                 // Export submenu
                 muxc::MenuFlyoutSubItem exportSub;
-                exportSub.Text(L"Export");
+                exportSub.Text(L"导出");
                 exportSub.Icon(muxc::FontIcon());
                 exportSub.Icon().as<muxc::FontIcon>().Glyph(L"\xEDE1");
 
@@ -430,7 +430,7 @@ namespace winrt::Gridex::implementation
                 exportSub.Items().Append(jsonItem);
 
                 muxc::MenuFlyoutItem sqlItem;
-                sqlItem.Text(L"SQL (INSERT)");
+                sqlItem.Text(L"SQL（INSERT）");
                 sqlItem.Click([this, exportName, exportSchema](auto&&, auto&&)
                 { if (OnExportTable) OnExportTable(exportName, exportSchema, L"sql"); });
                 exportSub.Items().Append(sqlItem);
@@ -439,7 +439,7 @@ namespace winrt::Gridex::implementation
 
                 // Import — load CSV/JSON/SQL into THIS specific table
                 muxc::MenuFlyoutItem importItem;
-                importItem.Text(L"Import...");
+                importItem.Text(L"导入...");
                 importItem.Icon(muxc::FontIcon());
                 importItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE8B5");
                 importItem.Click([this, exportName, exportSchema](auto&&, auto&&)
@@ -455,7 +455,7 @@ namespace winrt::Gridex::implementation
                     contextMenu.Items().Append(muxc::MenuFlyoutSeparator());
 
                     muxc::MenuFlyoutItem deleteItem;
-                    deleteItem.Text(L"Delete Table...");
+                    deleteItem.Text(L"删除表...");
                     deleteItem.Icon(muxc::FontIcon());
                     deleteItem.Icon().as<muxc::FontIcon>().Glyph(L"\xE74D"); // trash
                     deleteItem.Click([this, exportName, exportSchema](auto&&, auto&&)
@@ -551,7 +551,7 @@ namespace winrt::Gridex::implementation
         {
             muxc::MenuFlyout groupMenu;
             muxc::MenuFlyoutItem erItem;
-            erItem.Text(L"Show ER Diagram");
+            erItem.Text(L"显示 ER 图");
             erItem.Icon(muxc::FontIcon());
             erItem.Icon().as<muxc::FontIcon>().Glyph(L"\xF169");
             std::wstring groupSchema = item.title;  // schema/db name

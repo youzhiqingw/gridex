@@ -14,6 +14,12 @@
 
 namespace DBModels
 {
+    struct EndpointParts
+    {
+        std::string baseUrl;
+        std::string apiPrefix;
+    };
+
     // Trim leading/trailing whitespace from a wide string
     static std::wstring trimWs(const std::wstring& s)
     {
@@ -21,6 +27,46 @@ namespace DBModels
         if (start == std::wstring::npos) return {};
         size_t end = s.find_last_not_of(L" \t\r\n");
         return s.substr(start, end - start + 1);
+    }
+
+    static EndpointParts resolveEndpoint(
+        const std::wstring& endpoint,
+        const std::string& fallbackBase,
+        const std::string& defaultApiPrefix)
+    {
+        std::wstring trimmed = trimWs(endpoint);
+        if (trimmed.empty())
+            return { fallbackBase, defaultApiPrefix };
+
+        int size = WideCharToMultiByte(CP_UTF8, 0, trimmed.c_str(),
+            static_cast<int>(trimmed.size()), nullptr, 0, nullptr, nullptr);
+        if (size <= 0)
+            return { fallbackBase, defaultApiPrefix };
+
+        std::string base(size, '\0');
+        WideCharToMultiByte(CP_UTF8, 0, trimmed.c_str(),
+            static_cast<int>(trimmed.size()), &base[0], size, nullptr, nullptr);
+        while (!base.empty() && base.back() == '/')
+            base.pop_back();
+
+        auto stripSuffix = [&](const std::string& suffix) -> bool
+        {
+            if (base.size() <= suffix.size()) return false;
+            if (base.rfind(suffix) != base.size() - suffix.size()) return false;
+            base.erase(base.size() - suffix.size());
+            return true;
+        };
+
+        std::string apiPrefix = defaultApiPrefix;
+        if (stripSuffix("/v1beta"))
+            apiPrefix.clear();
+        else if (stripSuffix("/v1"))
+            apiPrefix.clear();
+
+        if (base.empty())
+            return { fallbackBase, defaultApiPrefix };
+
+        return { base, apiPrefix };
     }
 
     std::string AiService::toUtf8(const std::wstring& wstr)
@@ -56,7 +102,7 @@ namespace DBModels
         case AiProvider::Ollama:     return CallOllama(messages, systemPrompt);
         case AiProvider::Gemini:     return CallGemini(messages, systemPrompt);
         case AiProvider::OpenRouter: return CallOpenRouter(messages, systemPrompt);
-        default: return L"Unsupported AI provider";
+        default: return L"不支持的 AI 提供方";
         }
     }
 
@@ -65,9 +111,9 @@ namespace DBModels
         const std::wstring& schemaDescription)
     {
         std::wstring systemPrompt =
-            L"You are a SQL expert. Convert natural language to SQL queries. "
-            L"Only output the SQL query, no explanations.\n\n"
-            L"Database schema:\n" + schemaDescription;
+            L"你是 SQL 专家。请将自然语言转换为 SQL 查询。"
+            L"只输出 SQL 语句，不要解释。\n\n"
+            L"数据库模式：\n" + schemaDescription;
 
         std::vector<ChatMessage> messages;
         messages.push_back({ L"user", naturalLanguage });
@@ -80,14 +126,18 @@ namespace DBModels
         const std::vector<ChatMessage>& messages,
         const std::wstring& systemPrompt)
     {
-        httplib::Client cli("https://api.anthropic.com");
+        auto endpoint = resolveEndpoint(
+            config_.anthropicEndpoint,
+            "https://api.anthropic.com",
+            "/v1");
+        httplib::Client cli(endpoint.baseUrl);
         cli.set_connection_timeout(30);
         cli.set_read_timeout(60);
 
         // Validate API key
         auto apiKey = trimWs(config_.apiKey);
         if (apiKey.empty())
-            return L"Error: Anthropic API key is missing. Set it in Settings.";
+            return L"错误：缺少 Anthropic API 密钥。请在设置中填写。";
 
         nlohmann::json body;
         auto model = trimWs(config_.model);
@@ -112,13 +162,13 @@ namespace DBModels
             {"anthropic-version", "2023-06-01"}
         };
 
-        auto res = cli.Post("/v1/messages", headers, body.dump(), "application/json");
+        auto res = cli.Post(endpoint.apiPrefix + "/messages", headers, body.dump(), "application/json");
         if (!res)
-            return L"Error: Failed to connect to Anthropic API";
+            return L"错误：无法连接到 Anthropic API";
 
         if (res->status != 200)
-            return fromUtf8("Error " + std::to_string(res->status) +
-                            " (model=" + toUtf8(model) + "): " + res->body);
+            return fromUtf8("错误 " + std::to_string(res->status) +
+                            "（模型=" + toUtf8(model) + "）：" + res->body);
 
         try
         {
@@ -132,9 +182,9 @@ namespace DBModels
         }
         catch (const std::exception& e)
         {
-            return fromUtf8(std::string("Parse error: ") + e.what());
+            return fromUtf8(std::string("解析错误：") + e.what());
         }
-        return L"No response content";
+        return L"没有响应内容";
     }
 
     // ── OpenAI Chat Completions API ─────────────────
@@ -142,14 +192,18 @@ namespace DBModels
         const std::vector<ChatMessage>& messages,
         const std::wstring& systemPrompt)
     {
-        httplib::Client cli("https://api.openai.com");
+        auto endpoint = resolveEndpoint(
+            config_.openaiEndpoint,
+            "https://api.openai.com",
+            "/v1");
+        httplib::Client cli(endpoint.baseUrl);
         cli.set_connection_timeout(30);
         cli.set_read_timeout(60);
 
         // Validate API key
         auto apiKey = trimWs(config_.apiKey);
         if (apiKey.empty())
-            return L"Error: OpenAI API key is missing. Set it in Settings.";
+            return L"错误：缺少 OpenAI API 密钥。请在设置中填写。";
 
         nlohmann::json body;
         auto model = trimWs(config_.model);
@@ -177,13 +231,13 @@ namespace DBModels
             {"Authorization", "Bearer " + toUtf8(apiKey)}
         };
 
-        auto res = cli.Post("/v1/chat/completions", headers, body.dump(), "application/json");
+        auto res = cli.Post(endpoint.apiPrefix + "/chat/completions", headers, body.dump(), "application/json");
         if (!res)
-            return L"Error: Failed to connect to OpenAI API";
+            return L"错误：无法连接到 OpenAI API";
 
         if (res->status != 200)
-            return fromUtf8("Error " + std::to_string(res->status) +
-                            " (model=" + toUtf8(model) + "): " + res->body);
+            return fromUtf8("错误 " + std::to_string(res->status) +
+                            "（模型=" + toUtf8(model) + "）：" + res->body);
 
         try
         {
@@ -193,9 +247,9 @@ namespace DBModels
         }
         catch (const std::exception& e)
         {
-            return fromUtf8(std::string("Parse error: ") + e.what());
+            return fromUtf8(std::string("解析错误：") + e.what());
         }
-        return L"No response content";
+        return L"没有响应内容";
     }
 
     // ── Ollama API (local) ──────────────────────────
@@ -234,10 +288,10 @@ namespace DBModels
 
         auto res = cli.Post("/api/chat", body.dump(), "application/json");
         if (!res)
-            return L"Error: Failed to connect to Ollama (is it running?)";
+            return L"错误：无法连接到 Ollama（它正在运行吗？）";
 
         if (res->status != 200)
-            return fromUtf8("Error " + std::to_string(res->status) + ": " + res->body);
+            return fromUtf8("错误 " + std::to_string(res->status) + "：" + res->body);
 
         try
         {
@@ -247,9 +301,9 @@ namespace DBModels
         }
         catch (const std::exception& e)
         {
-            return fromUtf8(std::string("Parse error: ") + e.what());
+            return fromUtf8(std::string("解析错误：") + e.what());
         }
-        return L"No response content";
+        return L"没有响应内容";
     }
 
     // ── Google Gemini generateContent API ────────────
@@ -271,7 +325,7 @@ namespace DBModels
 
         auto apiKey = trimWs(config_.apiKey);
         if (apiKey.empty())
-            return L"Error: Gemini API key is missing. Set it in Settings.";
+            return L"错误：缺少 Gemini API 密钥。请在设置中填写。";
 
         auto model = trimWs(config_.model);
         if (model.empty()) model = L"gemini-2.0-flash";
@@ -311,11 +365,11 @@ namespace DBModels
 
         auto res = cli.Post(path, body.dump(), "application/json");
         if (!res)
-            return L"Error: Failed to connect to Gemini API";
+            return L"错误：无法连接到 Gemini API";
 
         if (res->status != 200)
-            return fromUtf8("Error " + std::to_string(res->status) +
-                            " (model=" + toUtf8(model) + "): " + res->body);
+            return fromUtf8("错误 " + std::to_string(res->status) +
+                            "（模型=" + toUtf8(model) + "）：" + res->body);
 
         try
         {
@@ -333,9 +387,9 @@ namespace DBModels
         }
         catch (const std::exception& e)
         {
-            return fromUtf8(std::string("Parse error: ") + e.what());
+            return fromUtf8(std::string("解析错误：") + e.what());
         }
-        return L"No response content";
+        return L"没有响应内容";
     }
 
     // ── OpenRouter chat completions ────────────────
@@ -354,7 +408,7 @@ namespace DBModels
 
         auto apiKey = trimWs(config_.apiKey);
         if (apiKey.empty())
-            return L"Error: OpenRouter API key is missing. Set it in Settings.";
+            return L"错误：缺少 OpenRouter API 密钥。请在设置中填写。";
 
         nlohmann::json body;
         auto model = trimWs(config_.model);
@@ -391,11 +445,11 @@ namespace DBModels
         auto res = cli.Post("/api/v1/chat/completions", headers,
                             body.dump(), "application/json");
         if (!res)
-            return L"Error: Failed to connect to OpenRouter API";
+            return L"错误：无法连接到 OpenRouter API";
 
         if (res->status != 200)
-            return fromUtf8("Error " + std::to_string(res->status) +
-                            " (model=" + toUtf8(model) + "): " + res->body);
+            return fromUtf8("错误 " + std::to_string(res->status) +
+                            "（模型=" + toUtf8(model) + "）：" + res->body);
 
         try
         {
@@ -405,9 +459,9 @@ namespace DBModels
         }
         catch (const std::exception& e)
         {
-            return fromUtf8(std::string("Parse error: ") + e.what());
+            return fromUtf8(std::string("解析错误：") + e.what());
         }
-        return L"No response content";
+        return L"没有响应内容";
     }
 
     // ── Fetch available models per provider ────────────
@@ -429,20 +483,24 @@ namespace DBModels
             {
                 if (apiKey.empty())
                 {
-                    r.errorMessage = L"Anthropic API key is missing.";
+                    r.errorMessage = L"缺少 Anthropic API 密钥。";
                     return r;
                 }
-                httplib::Client cli("https://api.anthropic.com");
+                auto endpoint = resolveEndpoint(
+                    config.anthropicEndpoint,
+                    "https://api.anthropic.com",
+                    "/v1");
+                httplib::Client cli(endpoint.baseUrl);
                 cli.set_connection_timeout(15);
                 cli.set_read_timeout(30);
                 httplib::Headers headers = {
                     { "x-api-key",        toUtf8(apiKey) },
                     { "anthropic-version","2023-06-01" },
                 };
-                auto res = cli.Get("/v1/models?limit=1000", headers);
+                auto res = cli.Get(endpoint.apiPrefix + "/models?limit=1000", headers);
                 if (!res)
                 {
-                    r.errorMessage = L"Anthropic models request failed (no response).";
+                    r.errorMessage = L"Anthropic 模型请求失败（无响应）。";
                     return r;
                 }
                 if (res->status != 200)
@@ -464,19 +522,23 @@ namespace DBModels
             {
                 if (apiKey.empty())
                 {
-                    r.errorMessage = L"OpenAI API key is missing.";
+                    r.errorMessage = L"缺少 OpenAI API 密钥。";
                     return r;
                 }
-                httplib::Client cli("https://api.openai.com");
+                auto endpoint = resolveEndpoint(
+                    config.openaiEndpoint,
+                    "https://api.openai.com",
+                    "/v1");
+                httplib::Client cli(endpoint.baseUrl);
                 cli.set_connection_timeout(15);
                 cli.set_read_timeout(30);
                 httplib::Headers headers = {
                     { "Authorization", "Bearer " + toUtf8(apiKey) },
                 };
-                auto res = cli.Get("/v1/models", headers);
+                auto res = cli.Get(endpoint.apiPrefix + "/models", headers);
                 if (!res)
                 {
-                    r.errorMessage = L"OpenAI models request failed (no response).";
+                    r.errorMessage = L"OpenAI 模型请求失败（无响应）。";
                     return r;
                 }
                 if (res->status != 200)
@@ -507,7 +569,7 @@ namespace DBModels
                 auto res = cli.Get("/api/tags");
                 if (!res)
                 {
-                    r.errorMessage = L"Ollama endpoint unreachable: " + endpointW;
+                    r.errorMessage = L"Ollama 端点不可达：" + endpointW;
                     return r;
                 }
                 if (res->status != 200)
@@ -529,7 +591,7 @@ namespace DBModels
             {
                 if (apiKey.empty())
                 {
-                    r.errorMessage = L"Gemini API key is missing.";
+                    r.errorMessage = L"缺少 Gemini API 密钥。";
                     return r;
                 }
                 httplib::Client cli("https://generativelanguage.googleapis.com");
@@ -539,7 +601,7 @@ namespace DBModels
                 auto res = cli.Get(path.c_str());
                 if (!res)
                 {
-                    r.errorMessage = L"Gemini models request failed (no response).";
+                    r.errorMessage = L"Gemini 模型请求失败（无响应）。";
                     return r;
                 }
                 if (res->status != 200)
@@ -579,7 +641,7 @@ namespace DBModels
                 auto res = cli.Get("/api/v1/models", headers);
                 if (!res)
                 {
-                    r.errorMessage = L"OpenRouter models request failed (no response).";
+                    r.errorMessage = L"OpenRouter 模型请求失败（无响应）。";
                     return r;
                 }
                 if (res->status != 200)
@@ -598,7 +660,7 @@ namespace DBModels
             }
 
             default:
-                r.errorMessage = L"Unsupported provider.";
+                r.errorMessage = L"不支持的提供方。";
                 return r;
             }
 
@@ -609,11 +671,11 @@ namespace DBModels
         }
         catch (const std::exception& e)
         {
-            r.errorMessage = fromUtf8(std::string("Parse error: ") + e.what());
+            r.errorMessage = fromUtf8(std::string("解析错误：") + e.what());
         }
         catch (...)
         {
-            r.errorMessage = L"Unknown error fetching models.";
+            r.errorMessage = L"获取模型时出现未知错误。";
         }
         return r;
     }

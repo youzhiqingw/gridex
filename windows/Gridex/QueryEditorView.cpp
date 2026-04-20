@@ -78,7 +78,7 @@ namespace winrt::Gridex::implementation
         sqlEditor_.TextWrapping(mux::TextWrapping::NoWrap);
         sqlEditor_.FontFamily(mux::Media::FontFamily(L"Cascadia Code,Consolas,monospace"));
         sqlEditor_.FontSize(13.0);
-        sqlEditor_.PlaceholderText(L"-- Write SQL here... (Ctrl+Enter to run, Ctrl+Space for suggestions)");
+        sqlEditor_.PlaceholderText(L"-- 在此编写 SQL...（Ctrl+Enter 运行，Ctrl+Space 显示建议）");
         sqlEditor_.HorizontalAlignment(mux::HorizontalAlignment::Stretch);
         sqlEditor_.VerticalAlignment(mux::VerticalAlignment::Stretch);
         sqlEditor_.Padding(mux::Thickness{ 12, 8, 12, 8 });
@@ -477,7 +477,7 @@ namespace winrt::Gridex::implementation
         if (sql.empty()) return;
         HideSuggestions();
 
-        QueryStatusText().Text(L"Running...");
+        QueryStatusText().Text(L"正在运行...");
 
         if (OnExecuteQuery)
         {
@@ -574,8 +574,8 @@ namespace winrt::Gridex::implementation
     {
         ResultsContainer().Children().Clear();
 
-        std::wstring status = std::to_wstring(result.totalRows) + L" rows  \u00B7  " +
-            std::to_wstring(static_cast<int>(result.executionTimeMs)) + L" ms";
+        std::wstring status = std::to_wstring(result.totalRows) + L" 行  \u00B7  " +
+            std::to_wstring(static_cast<int>(result.executionTimeMs)) + L" 毫秒";
         QueryStatusText().Text(winrt::hstring(status));
         ResultsHeader().Visibility(mux::Visibility::Visible);
         ResultsSummaryText().Text(winrt::hstring(status));
@@ -795,7 +795,7 @@ namespace winrt::Gridex::implementation
     void QueryEditorView::ShowError(const std::wstring& message)
     {
         ResultsContainer().Children().Clear();
-        QueryStatusText().Text(L"Error");
+        QueryStatusText().Text(L"错误");
         ResultsHeader().Visibility(mux::Visibility::Collapsed);
 
         muxc::TextBlock errText;

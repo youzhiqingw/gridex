@@ -756,7 +756,7 @@ namespace DBModels
             }
         }
         catch (...) {}
-        return L"Unknown";
+        return L"未知";
     }
 
     std::wstring MSSQLAdapter::currentDatabase()

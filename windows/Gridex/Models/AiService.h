@@ -21,6 +21,8 @@ namespace DBModels
     struct AiConfig
     {
         AiProvider provider = AiProvider::Anthropic;
+        std::wstring anthropicEndpoint; // e.g. "https://api.anthropic.com"
+        std::wstring openaiEndpoint;    // e.g. "https://api.openai.com"
         std::wstring apiKey;
         std::wstring model;          // e.g. "claude-sonnet-4-20250514", "gpt-4o", "llama3", "gemini-2.0-flash"
         std::wstring ollamaEndpoint; // e.g. "http://localhost:11434"

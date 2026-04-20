@@ -629,7 +629,7 @@ namespace DBModels
     {
         ensureConnected();
         const char* ver = mysql_get_server_info(conn_);
-        return ver ? fromUtf8(ver) : L"Unknown";
+        return ver ? fromUtf8(ver) : L"未知";
     }
 
     std::wstring MySQLAdapter::currentDatabase()

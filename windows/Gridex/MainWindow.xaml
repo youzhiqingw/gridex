@@ -24,7 +24,7 @@
                         Spacing="16">
                 <ProgressRing IsActive="True" Width="48" Height="48" />
                 <TextBlock x:Name="UpdateCheckStatusText"
-                           Text="Checking for updates..."
+                           Text="正在检查更新..."
                            HorizontalAlignment="Center"
                            FontSize="13"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />

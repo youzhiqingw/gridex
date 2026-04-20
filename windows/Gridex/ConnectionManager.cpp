@@ -124,7 +124,7 @@ namespace DBModels
         }
         catch (...)
         {
-            outError = L"Unknown error";
+            outError = L"未知错误";
         }
 
         if (testTunnel) testTunnel->close();
@@ -149,7 +149,7 @@ namespace DBModels
             return std::make_shared<MSSQLAdapter>();
         default:
             throw DatabaseError(DatabaseError::Code::ConnectionFailed,
-                "Unsupported database type");
+                "不支持的数据库类型");
         }
     }
 }

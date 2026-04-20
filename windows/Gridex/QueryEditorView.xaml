@@ -25,17 +25,17 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Button x:Name="RunQueryButton" Grid.Column="0" Content="Run" Padding="16,4"
+                <Button x:Name="RunQueryButton" Grid.Column="0" Content="运行" Padding="16,4"
                     Style="{StaticResource AccentButtonStyle}"
-                    ToolTipService.ToolTip="Execute (Ctrl+Enter)" />
+                    ToolTipService.ToolTip="执行（Ctrl+Enter）" />
             <Button x:Name="FormatQueryButton" Grid.Column="1" Margin="4,0,0,0" Padding="8,4"
                     Background="Transparent" BorderThickness="0"
-                    ToolTipService.ToolTip="Format SQL">
+                    ToolTipService.ToolTip="格式化 SQL">
                 <FontIcon Glyph="&#xE943;" FontSize="14" />
             </Button>
             <Button x:Name="ClearEditorButton" Grid.Column="2" Margin="4,0,0,0" Padding="8,4"
                     Background="Transparent" BorderThickness="0"
-                    ToolTipService.ToolTip="Clear">
+                    ToolTipService.ToolTip="清空">
                 <FontIcon Glyph="&#xE74D;" FontSize="14" />
             </Button>
 

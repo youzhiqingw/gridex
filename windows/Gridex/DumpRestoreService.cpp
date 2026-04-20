@@ -209,8 +209,8 @@ namespace DBModels
         DumpResult result;
         if (!adapter || !adapter->isConnected())
         {
-            result.error = L"Not connected";
-            report(L"[error] Not connected");
+            result.error = L"未连接";
+            report(L"[错误] 未连接");
             return result;
         }
         if (batchSize <= 0) batchSize = DEFAULT_BATCH_SIZE;
@@ -218,7 +218,7 @@ namespace DBModels
         std::ofstream file(outputFile, std::ios::binary);
         if (!file.is_open())
         {
-            result.error = L"Cannot open output file: " + outputFile;
+            result.error = L"无法打开输出文件：" + outputFile;
             return result;
         }
 
@@ -252,12 +252,12 @@ namespace DBModels
 
             // List tables
             auto tables = adapter->listTables(schema);
-            report(L"Found " + std::to_wstring(tables.size()) + L" tables in schema '" + schema + L"'");
+            report(L"在模式 '" + schema + L"' 中找到 " + std::to_wstring(tables.size()) + L" 张表");
 
             // Disable FK checks (MySQL only)
             if (!fkOff.empty())
             {
-                writeUtf8(file, L"-- Disable foreign key checks during restore\n");
+                writeUtf8(file, L"-- 还原期间禁用外键检查\n");
                 writeUtf8(file, fkOff + L"\n");
             }
 
@@ -267,7 +267,7 @@ namespace DBModels
                 const auto& tableName = tableInfo.name;
                 tableIdx++;
                 report(L"[" + std::to_wstring(tableIdx) + L"/" +
-                    std::to_wstring(tables.size()) + L"] Dumping table: " + tableName);
+                    std::to_wstring(tables.size()) + L"] 正在导出表：" + tableName);
 
                 writeUtf8(file, sep);
                 writeUtf8(file, L"-- Table: " + tableName + L"\n");
@@ -281,7 +281,7 @@ namespace DBModels
                 std::wstring ddl = adapter->getCreateTableSQL(tableName, schema);
                 if (ddl.empty())
                 {
-                    writeUtf8(file, L"-- WARNING: could not generate DDL for " + tableName + L"\n\n");
+                    writeUtf8(file, L"-- 警告：无法为 " + tableName + L" 生成 DDL\n\n");
                     continue;
                 }
                 writeUtf8(file, ddl);
@@ -328,16 +328,16 @@ namespace DBModels
                     offset += batchSize;
                 }
 
-                writeUtf8(file, L"-- " + std::to_wstring(tableRowCount) + L" rows\n\n");
+                writeUtf8(file, L"-- " + std::to_wstring(tableRowCount) + L" 行\n\n");
                 result.tablesProcessed++;
-                report(L"  -> " + std::to_wstring(tableRowCount) + L" rows");
+                report(L"  -> " + std::to_wstring(tableRowCount) + L" 行");
             }
 
             // Re-enable FK checks (MySQL only)
             if (!fkOn.empty()) writeUtf8(file, fkOn);
 
-            report(L"Dump complete: " + std::to_wstring(result.tablesProcessed) +
-                L" tables, " + std::to_wstring(result.rowsExported) + L" rows total");
+            report(L"导出完成：" + std::to_wstring(result.tablesProcessed) +
+                L" 张表，共 " + std::to_wstring(result.rowsExported) + L" 行");
         }
         catch (const DatabaseError& ex)
         {
@@ -355,7 +355,7 @@ namespace DBModels
         }
         catch (...)
         {
-            result.error = L"Unknown error during dump";
+            result.error = L"导出过程中出现未知错误";
             file.close();
             return result;
         }
@@ -377,31 +377,31 @@ namespace DBModels
         RestoreResult result;
         if (!adapter || !adapter->isConnected())
         {
-            result.error = L"Not connected";
-            report(L"[error] Not connected");
+            result.error = L"未连接";
+            report(L"[错误] 未连接");
             return result;
         }
 
         // Read file
-        report(L"Reading file: " + inputFile);
+        report(L"正在读取文件：" + inputFile);
         std::wstring content = ImportService::ReadFileAsWstring(inputFile);
         if (content.empty())
         {
-            result.error = L"Cannot read or empty file: " + inputFile;
-            report(L"[error] " + result.error);
+            result.error = L"无法读取或文件为空：" + inputFile;
+            report(L"[错误] " + result.error);
             return result;
         }
 
         // Parse SQL statements (reuses existing import parser)
-        report(L"Parsing SQL statements...");
+        report(L"正在解析 SQL 语句...");
         auto parsed = ImportService::ParseSql(content);
         if (!parsed.success)
         {
             result.error = parsed.error;
-            report(L"[error] Parse failed: " + parsed.error);
+            report(L"[错误] 解析失败：" + parsed.error);
             return result;
         }
-        report(L"Parsed " + std::to_wstring(parsed.sqlStatements.size()) + L" statements");
+        report(L"已解析 " + std::to_wstring(parsed.sqlStatements.size()) + L" 条语句");
 
         // Helper to capture first failure context (statement preview + error msg)
         auto captureFailure = [&](const std::wstring& stmt, const std::wstring& errMsg)
@@ -410,14 +410,14 @@ namespace DBModels
             // Truncate statement preview for readability
             std::wstring preview = stmt;
             if (preview.size() > 250) preview = preview.substr(0, 250) + L"...";
-            result.error = L"Statement #" + std::to_wstring(result.statementsExecuted + 1) +
-                L" failed:\n\n" + preview + L"\n\nError: " + errMsg;
+            result.error = L"第 " + std::to_wstring(result.statementsExecuted + 1) +
+                L" 条语句失败：\n\n" + preview + L"\n\n错误：" + errMsg;
         };
 
         try
         {
             adapter->beginTransaction();
-            report(L"Transaction started");
+            report(L"事务已开始");
 
             int idx = 0;
             int totalStmts = static_cast<int>(parsed.sqlStatements.size());

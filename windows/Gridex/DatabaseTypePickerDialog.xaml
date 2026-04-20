@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <StackPanel Spacing="16" MinWidth="420">
-        <TextBlock Text="Select a database type"
+        <TextBlock Text="选择数据库类型"
                    FontSize="14"
                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 

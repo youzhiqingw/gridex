@@ -12,6 +12,8 @@ namespace DBModels
 
         // AI
         int aiProviderIndex = 0;         // 0=Anthropic, 1=OpenAI, 2=Ollama
+        std::wstring anthropicEndpoint;
+        std::wstring openaiEndpoint;
         std::wstring aiApiKey;
         std::wstring aiModel;
         std::wstring ollamaEndpoint;

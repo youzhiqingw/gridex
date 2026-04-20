@@ -25,7 +25,7 @@ namespace winrt::Gridex::implementation
         auto combo = GroupCombo();
         combo.Items().Clear();
         // First item: no group
-        combo.Items().Append(winrt::box_value(winrt::hstring(L"(None)")));
+        combo.Items().Append(winrt::box_value(winrt::hstring(L"（无）")));
         // Load groups from settings
         auto s = DBModels::AppSettings::Load();
         for (const auto& g : s.connectionGroups)
@@ -80,7 +80,7 @@ namespace winrt::Gridex::implementation
         if (isRedis)
             DatabaseInput().PlaceholderText(L"0");
         else if (isMongo)
-            DatabaseInput().PlaceholderText(L"mydb (or leave empty for URI)");
+            DatabaseInput().PlaceholderText(L"mydb（或留空以使用 URI）");
         else if (dbType_ == DBModels::DatabaseType::MSSQLServer)
             DatabaseInput().PlaceholderText(L"master");
         else if (!isSqlite)

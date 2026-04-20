@@ -662,7 +662,7 @@ namespace DBModels
             auto it = result.rows[0].find(L"server_version");
             if (it != result.rows[0].end()) return it->second;
         }
-        return L"Unknown";
+        return L"未知";
     }
 
     std::wstring PostgreSQLAdapter::currentDatabase()

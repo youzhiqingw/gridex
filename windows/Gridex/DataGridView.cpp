@@ -92,7 +92,7 @@ namespace winrt::Gridex::implementation
             muxc::MenuFlyout contextMenu;
 
             muxc::MenuFlyoutItem refreshItem;
-            refreshItem.Text(L"Refresh");
+            refreshItem.Text(L"刷新");
             muxc::FontIcon refreshIcon;
             refreshIcon.Glyph(L"\xE72C");
             refreshItem.Icon(refreshIcon);
@@ -105,7 +105,7 @@ namespace winrt::Gridex::implementation
             contextMenu.Items().Append(muxc::MenuFlyoutSeparator{});
 
             muxc::MenuFlyoutItem deleteItem;
-            deleteItem.Text(L"Delete Row");
+            deleteItem.Text(L"删除行");
             muxc::FontIcon deleteIcon;
             deleteIcon.Glyph(L"\xE74D");
             deleteItem.Icon(deleteIcon);
@@ -123,7 +123,7 @@ namespace winrt::Gridex::implementation
             contextMenu.Items().Append(viewRelSeparator);
 
             muxc::MenuFlyoutItem viewRelItem;
-            viewRelItem.Text(L"View Relationship");
+            viewRelItem.Text(L"查看关联");
             muxc::FontIcon viewRelIcon;
             viewRelIcon.Glyph(L"\xE71B"); // Link
             viewRelItem.Icon(viewRelIcon);
@@ -370,7 +370,7 @@ namespace winrt::Gridex::implementation
                 pkIcon.Foreground(muxm::SolidColorBrush(
                     winrt::Windows::UI::ColorHelper::FromArgb(255, 220, 170, 40)));
                 muxc::ToolTip pkTip;
-                pkTip.Content(winrt::box_value(winrt::hstring(L"Primary Key")));
+                pkTip.Content(winrt::box_value(winrt::hstring(L"主键")));
                 muxc::ToolTipService::SetToolTip(pkIcon, pkTip);
                 muxc::Grid::SetColumn(pkIcon, 0);
                 headerContent.Children().Append(pkIcon);
@@ -396,7 +396,7 @@ namespace winrt::Gridex::implementation
 
                 std::wstring refTable  = meta->fkReferencedTable;
                 std::wstring refColumn = meta->fkReferencedColumn;
-                std::wstring fkTipText = L"Foreign Key → " + refTable;
+                std::wstring fkTipText = L"外键 → " + refTable;
                 if (!refColumn.empty()) fkTipText += L"." + refColumn;
                 fkTipText += L"\n(click to open referenced table)";
                 muxc::ToolTip fkTip;

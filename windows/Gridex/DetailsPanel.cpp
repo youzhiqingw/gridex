@@ -314,7 +314,7 @@ namespace winrt::Gridex::implementation
         chatHistory_.push_back({ L"user", text });
 
         // Show loading indicator
-        AddChatBubble(L"system", L"Thinking...");
+        AddChatBubble(L"system", L"正在思考...");
 
         // Build the effective schema context: base schemaContext_ plus the
         // DDL of any tables the user pinned via the "+" picker. Building
@@ -338,9 +338,9 @@ namespace winrt::Gridex::implementation
         std::thread([this, dispatcher, history, schema, &aiSvc]()
         {
             std::wstring systemPrompt =
-                L"You are a helpful database assistant. Help the user with SQL queries and database questions.";
+                L"你是一个有帮助的数据库助手。请协助用户处理 SQL 查询和数据库问题。";
             if (!schema.empty())
-                systemPrompt += L"\n\nDatabase schema:\n" + schema;
+                systemPrompt += L"\n\n数据库模式：\n" + schema;
 
             auto response = aiSvc.SendChat(history, systemPrompt);
 

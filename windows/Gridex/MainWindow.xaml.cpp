@@ -145,15 +145,15 @@ namespace winrt::Gridex::implementation
                             return;
                         }
 
-                        std::wstring msg = L"Current: " + r.currentVersion +
-                                           L"\nNew:     " + r.newVersion +
-                                           L"\n\nDownload and install now? The app will restart.";
+                        std::wstring msg = L"当前: " + r.currentVersion +
+                                           L"\n新版本: " + r.newVersion +
+                                           L"\n\n立即下载并安装？应用将重启。";
                         winrt::Microsoft::UI::Xaml::Controls::ContentDialog dlg;
                         dlg.Title(winrt::box_value(winrt::hstring(
-                            L"Gridex " + r.newVersion + L" is available")));
+                            L"Gridex " + r.newVersion + L" 可用"));
                         dlg.Content(winrt::box_value(winrt::hstring(msg)));
-                        dlg.PrimaryButtonText(L"Install");
-                        dlg.CloseButtonText(L"Later");
+                        dlg.PrimaryButtonText(L"安装");
+                        dlg.CloseButtonText(L"稍后");
                         dlg.DefaultButton(
                             winrt::Microsoft::UI::Xaml::Controls::ContentDialogButton::Primary);
                         dlg.XamlRoot(xamlRoot);
@@ -178,7 +178,7 @@ namespace winrt::Gridex::implementation
                                 {
                                     // Status text on overlay while the download
                                     // runs; process exits from inside the worker.
-                                    UpdateCheckStatusText().Text(L"Downloading update...");
+                                    UpdateCheckStatusText().Text(L"正在下载更新...");
                                     ::Gridex::DownloadAndApplyAsync(
                                         [](std::wstring) {},
                                         [](std::wstring) {});
@@ -258,8 +258,8 @@ namespace winrt::Gridex::implementation
         if (!xamlRoot) return;
 
         mux::Controls::ContentDialog dlg;
-        dlg.Title(winrt::box_value(winrt::hstring(L"Keyboard Shortcuts")));
-        dlg.CloseButtonText(L"Close");
+        dlg.Title(winrt::box_value(winrt::hstring(L"键盘快捷键")));
+        dlg.CloseButtonText(L"关闭");
         dlg.DefaultButton(mux::Controls::ContentDialogButton::Close);
         dlg.XamlRoot(xamlRoot);
 

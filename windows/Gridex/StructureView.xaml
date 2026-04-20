@@ -30,15 +30,15 @@
                     Padding="8,4" Background="Transparent" BorderThickness="0">
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <FontIcon Glyph="&#xE710;" FontSize="10" />
-                    <TextBlock Text="Column" FontSize="11" />
+                    <TextBlock Text="列" FontSize="11" />
                 </StackPanel>
             </Button>
 
             <TextBlock x:Name="PendingAlterText" Grid.Column="2"
                        FontSize="11" VerticalAlignment="Center"
                        Foreground="Orange" Margin="0,0,8,0" />
-            <Button x:Name="ApplyAlterBtn" Grid.Column="3"
-                    Content="Apply" Padding="10,4" FontSize="11"
+                <Button x:Name="ApplyAlterBtn" Grid.Column="3"
+                    Content="应用" Padding="10,4" FontSize="11"
                     Style="{StaticResource AccentButtonStyle}"
                     Visibility="Collapsed" />
         </Grid>

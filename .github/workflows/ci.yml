@@ -31,3 +31,43 @@ jobs:
 
       - name: Build (Release)
         run: swift build -c release
+
+  build-windows-exe:
+    name: Build Windows exe
+    runs-on: windows-2022
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install vcpkg
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path 'C:\vcpkg\vcpkg.exe')) {
+            git clone https://github.com/microsoft/vcpkg C:\vcpkg
+          }
+          & 'C:\vcpkg\bootstrap-vcpkg.bat' -disableMetrics
+
+      - name: Install vcpkg dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & 'C:\vcpkg\vcpkg.exe' install `
+            sqlite3 libpq libmariadb openssl hiredis `
+            nlohmann-json cpp-httplib libssh2 mongocxx bsoncxx `
+            --triplet x64-windows
+
+      - name: Build unpackaged exe
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          .\windows\scripts\build-unpackaged.ps1
+
+      - name: Upload exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gridex-windows-x64
+          path: windows/Gridex/x64/Release/Gridex/
+          if-no-files-found: error

@@ -105,7 +105,7 @@ namespace DBModels
         ImportResult result;
         if (content.empty())
         {
-            result.error = L"File is empty";
+            result.error = L"文件为空";
             return result;
         }
 
@@ -117,7 +117,7 @@ namespace DBModels
         result.columnNames = parseCsvLine(content, pos);
         if (result.columnNames.empty())
         {
-            result.error = L"No header row found";
+            result.error = L"未找到表头行";
             return result;
         }
 
@@ -253,7 +253,7 @@ namespace DBModels
         ImportResult result;
         if (content.empty())
         {
-            result.error = L"File is empty";
+            result.error = L"文件为空";
             return result;
         }
 
@@ -264,7 +264,7 @@ namespace DBModels
         skipWhitespace(content, pos);
         if (pos >= content.size() || content[pos] != L'[')
         {
-            result.error = L"Expected JSON array starting with '['";
+            result.error = L"期望以 '[' 开头的 JSON 数组";
             return result;
         }
         pos++; // skip '['
@@ -285,7 +285,7 @@ namespace DBModels
             if (content[pos] == L',') { pos++; continue; }
             if (content[pos] != L'{')
             {
-                result.error = L"Expected '{' at position " + std::to_wstring(pos);
+                result.error = L"位置 " + std::to_wstring(pos) + L" 处应为 '{'";
                 return result;
             }
             pos++; // skip '{'
@@ -321,7 +321,7 @@ namespace DBModels
         ImportResult result;
         if (content.empty())
         {
-            result.error = L"File is empty";
+            result.error = L"文件为空";
             return result;
         }
 
@@ -372,7 +372,7 @@ namespace DBModels
         result.totalParsed = static_cast<int>(result.sqlStatements.size());
         result.success = (result.totalParsed > 0);
         if (!result.success)
-            result.error = L"No SQL statements found";
+            result.error = L"未找到 SQL 语句";
         return result;
     }
 

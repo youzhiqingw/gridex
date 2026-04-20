@@ -13,21 +13,21 @@
                 <Button x:Name="BackBtn"
                         Background="Transparent" BorderThickness="0"
                         Padding="8,4" HorizontalAlignment="Left"
-                        ToolTipService.ToolTip="Back">
+                        ToolTipService.ToolTip="返回">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xE72B;" FontSize="14" />
-                        <TextBlock Text="Back" FontSize="13" />
+                        <TextBlock Text="返回" FontSize="13" />
                     </StackPanel>
                 </Button>
-                <TextBlock Text="Settings" FontSize="28" FontWeight="SemiBold" />
-                <TextBlock Text="Configure Gridex preferences"
+                <TextBlock Text="设置" FontSize="28" FontWeight="SemiBold" />
+                <TextBlock Text="配置 Gridex 偏好"
                            FontSize="13"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
             <!-- Appearance -->
             <StackPanel Spacing="12">
-                <TextBlock Text="Appearance" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="外观" FontSize="16" FontWeight="SemiBold" />
 
                 <Grid Padding="16"
                       Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -44,8 +44,8 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
-                        <TextBlock Text="Theme" FontSize="14" />
-                        <TextBlock Text="Choose light, dark, or system default"
+                        <TextBlock Text="主题" FontSize="14" />
+                        <TextBlock Text="选择浅色、深色或系统默认"
                                    FontSize="12"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
@@ -53,9 +53,9 @@
                               MinWidth="140"
                               SelectedIndex="0"
 >
-                        <ComboBoxItem Content="System Default" />
-                        <ComboBoxItem Content="Light" />
-                        <ComboBoxItem Content="Dark" />
+                        <ComboBoxItem Content="系统默认" />
+                        <ComboBoxItem Content="浅色" />
+                        <ComboBoxItem Content="深色" />
                     </ComboBox>
 
                     <Border Grid.Row="1" Grid.ColumnSpan="2"
@@ -67,7 +67,7 @@
 
             <!-- AI Configuration -->
             <StackPanel Spacing="12">
-                <TextBlock Text="AI Assistant" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="AI 助手" FontSize="16" FontWeight="SemiBold" />
 
                 <Grid Padding="16"
                       Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -76,31 +76,47 @@
                       BorderThickness="1">
                     <StackPanel Spacing="16">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Provider" FontSize="14" />
+                            <TextBlock Text="提供方" FontSize="14" />
                             <!-- Order MUST match DBModels::AiProvider enum
                                  in Models/AiService.h — never reorder, only
                                  append at the end (the index is persisted
                                  in settings as aiProviderIndex). -->
                             <ComboBox x:Name="AiProviderCombo" MinWidth="200"
                                       SelectedIndex="0">
-                                <ComboBoxItem Content="Anthropic (Claude)" />
-                                <ComboBoxItem Content="OpenAI (GPT)" />
-                                <ComboBoxItem Content="Ollama (Local)" />
+                                <ComboBoxItem Content="Anthropic（Claude）" />
+                                <ComboBoxItem Content="OpenAI（GPT）" />
+                                <ComboBoxItem Content="Ollama（本地）" />
                                 <ComboBoxItem Content="Google Gemini" />
                                 <ComboBoxItem Content="OpenRouter" />
                             </ComboBox>
                         </StackPanel>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="API Key" FontSize="14" />
+                            <TextBlock Text="Anthropic 基础地址" FontSize="14" />
+                            <TextBox x:Name="AnthropicEndpointBox"
+                                     PlaceholderText="https://api.anthropic.com"
+                                     Width="400"
+                                     HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="OpenAI 基础地址" FontSize="14" />
+                            <TextBox x:Name="OpenAIEndpointBox"
+                                     PlaceholderText="https://api.openai.com"
+                                     Width="400"
+                                     HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="API 密钥" FontSize="14" />
                             <PasswordBox x:Name="ApiKeyBox"
-                                         PlaceholderText="Enter your API key..."
+                                         PlaceholderText="输入你的 API 密钥..."
                                          Width="400"
                                          HorizontalAlignment="Left" />
                         </StackPanel>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Model" FontSize="14" />
+                            <TextBlock Text="模型" FontSize="14" />
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <!-- Editable ComboBox: pick from the
                                      list fetched via Refresh, or type a
@@ -108,13 +124,13 @@
                                      OpenAI-compatible proxies, etc.). -->
                                 <ComboBox x:Name="ModelBox"
                                           IsEditable="true"
-                                          PlaceholderText="Pick or type a model…"
+                                          PlaceholderText="选择或输入模型…"
                                           Width="400" />
                                 <Button x:Name="RefreshModelsBtn"
-                                        ToolTipService.ToolTip="Fetch available models from the selected provider">
+                                        ToolTipService.ToolTip="从所选提供方获取可用模型">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <FontIcon Glyph="&#xE72C;" FontSize="12" />
-                                        <TextBlock Text="Refresh" FontSize="12" />
+                                        <TextBlock Text="刷新" FontSize="12" />
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
@@ -125,7 +141,7 @@
                         </StackPanel>
 
                         <StackPanel x:Name="OllamaEndpointPanel" Spacing="4">
-                            <TextBlock Text="Ollama Endpoint" FontSize="14" />
+                            <TextBlock Text="Ollama 端点" FontSize="14" />
                             <TextBox x:Name="OllamaEndpointBox"
                                      PlaceholderText="http://localhost:11434"
                                      Width="400"
@@ -137,7 +153,7 @@
 
             <!-- Editor -->
             <StackPanel Spacing="12">
-                <TextBlock Text="Editor" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="编辑器" FontSize="16" FontWeight="SemiBold" />
 
                 <Grid Padding="16"
                       Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -146,7 +162,7 @@
                       BorderThickness="1">
                     <StackPanel Spacing="12">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Font Size" FontSize="14" />
+                            <TextBlock Text="字体大小" FontSize="14" />
                             <NumberBox x:Name="EditorFontSizeBox" Value="13"
                                        Minimum="8" Maximum="24"
                                        SpinButtonPlacementMode="Inline"
@@ -155,7 +171,7 @@
                         </StackPanel>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Default Row Limit" FontSize="14" />
+                            <TextBlock Text="默认行数上限" FontSize="14" />
                             <NumberBox x:Name="RowLimitBox" Value="100"
                                        Minimum="10" Maximum="10000"
                                        SpinButtonPlacementMode="Inline"
@@ -168,7 +184,7 @@
 
             <!-- Updates -->
             <StackPanel Spacing="12">
-                <TextBlock Text="Updates" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="更新" FontSize="16" FontWeight="SemiBold" />
 
                 <Grid Padding="16"
                       Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -181,16 +197,16 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Spacing="2">
-                        <TextBlock Text="Check for updates" FontSize="14" />
+                        <TextBlock Text="检查更新" FontSize="14" />
                         <TextBlock x:Name="UpdateStatusText"
-                                   Text="Click the button to check."
+                                   Text="点击按钮进行检查。"
                                    FontSize="12"
                                    TextWrapping="Wrap"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
                     <Button x:Name="CheckUpdateButton"
                             Grid.Column="1"
-                            Content="Check Now"
+                            Content="立即检查"
                             Padding="16,6"
                             VerticalAlignment="Center" />
                 </Grid>
@@ -200,7 +216,7 @@
                  DBModels::BuildShortcutsView() so this section and the
                  Ctrl+/ dialog stay visually identical. -->
             <StackPanel Spacing="12">
-                <TextBlock Text="Keyboard Shortcuts" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="键盘快捷键" FontSize="16" FontWeight="SemiBold" />
                 <Border Padding="16"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         CornerRadius="8"
@@ -210,7 +226,7 @@
                         <TextBlock FontSize="12"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    TextWrapping="Wrap"
-                                   Text="Press Ctrl+/ or F1 anywhere in the app to open this reference." />
+                                   Text="在应用中任意位置按 Ctrl+/ 或 F1 打开此参考。" />
                         <ContentControl x:Name="ShortcutsHost"
                                         HorizontalContentAlignment="Stretch" />
                     </StackPanel>
@@ -219,11 +235,11 @@
 
             <!-- About -->
             <StackPanel Spacing="8">
-                <TextBlock Text="About" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="关于" FontSize="16" FontWeight="SemiBold" />
                 <TextBlock FontSize="13"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
                     <Run Text="Gridex" FontWeight="SemiBold" />
-                    <Run Text=" — AI-Native Database IDE" />
+                    <Run Text=" — AI 原生数据库 IDE" />
                 </TextBlock>
                 <TextBlock x:Name="VersionText"
                            FontSize="12"
@@ -234,15 +250,15 @@
                            Margin="0,8,0,0"
                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                            TextWrapping="Wrap">
-                    <Run Text="ER Diagram rendering powered by " />
+                    <Run Text="ER 图渲染由 " />
                     <Run Text="D2" FontWeight="SemiBold" />
                     <Run Text=" (MPL-2.0) © Terrastruct, Inc." />
                     <LineBreak />
-                    <Run Text="Database connectivity via libpq, libmariadb, sqlite3. UI via WinUI 3 + WebView2." />
+                    <Run Text="数据库连接通过 libpq、libmariadb、sqlite3。界面使用 WinUI 3 + WebView2。" />
                 </TextBlock>
 
                 <Button x:Name="ViewLicensesButton"
-                        Content="View Open Source Licenses..."
+                        Content="查看开源许可证..."
                         Margin="0,8,0,0"
                         Padding="12,4"
                         FontSize="12" />
@@ -259,8 +275,8 @@
                                VerticalAlignment="Center"
                                FontSize="12"
                                Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                    <Button x:Name="SaveAiButton"
-                            Content="Save All Settings"
+                        <Button x:Name="SaveAiButton"
+                            Content="保存全部设置"
                             Padding="20,8"
                             Style="{StaticResource AccentButtonStyle}" />
                 </StackPanel>

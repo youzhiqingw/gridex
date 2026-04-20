@@ -78,14 +78,14 @@ namespace winrt::Gridex::implementation
         StructureContainer().Children().Clear();
 
         // Columns section
-        AddSectionHeader(StructureContainer(), L"Columns");
+        AddSectionHeader(StructureContainer(), L"列");
         for (int i = 0; i < static_cast<int>(columns_.size()); i++)
             AddColumnRow(StructureContainer(), columns_[i], i, i % 2 == 1);
 
         // Indexes section
         if (!indexes_.empty())
         {
-            AddSectionHeader(StructureContainer(), L"Indexes");
+            AddSectionHeader(StructureContainer(), L"索引");
             for (int i = 0; i < static_cast<int>(indexes_.size()); i++)
                 AddIndexRow(StructureContainer(), indexes_[i], i % 2 == 1);
         }

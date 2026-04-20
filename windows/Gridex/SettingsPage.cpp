@@ -27,7 +27,7 @@ namespace winrt::Gridex::implementation
             // Stamp the build version into the About section. GRIDEX_VERSION
             // comes from GridexVersion.h which pulls the CI-generated header
             // when present (release builds) or falls back to "0.0.0-dev".
-            VersionText().Text(winrt::hstring(L"Version " GRIDEX_VERSION));
+            VersionText().Text(winrt::hstring(L"版本 " GRIDEX_VERSION));
 
             // Populate the Keyboard Shortcuts section from the shared
             // catalog — same builder feeds the Ctrl+/ dialog, so edits
@@ -38,6 +38,8 @@ namespace winrt::Gridex::implementation
             auto s = DBModels::AppSettings::Load();
             ThemeCombo().SelectedIndex(s.themeIndex);
             AiProviderCombo().SelectedIndex(s.aiProviderIndex);
+            AnthropicEndpointBox().Text(winrt::hstring(s.anthropicEndpoint));
+            OpenAIEndpointBox().Text(winrt::hstring(s.openaiEndpoint));
             ApiKeyBox().Password(winrt::hstring(s.aiApiKey));
             // ModelBox is an editable ComboBox. Set .Text so any
             // previously-saved model (including free-typed custom
@@ -58,13 +60,15 @@ namespace winrt::Gridex::implementation
                 {
                     DBModels::AiConfig cfg;
                     cfg.provider = static_cast<DBModels::AiProvider>(AiProviderCombo().SelectedIndex());
+                    cfg.anthropicEndpoint = std::wstring(AnthropicEndpointBox().Text());
+                    cfg.openaiEndpoint = std::wstring(OpenAIEndpointBox().Text());
                     cfg.apiKey   = std::wstring(ApiKeyBox().Password());
                     cfg.model    = std::wstring(ModelBox().Text());
                     cfg.ollamaEndpoint = std::wstring(OllamaEndpointBox().Text());
 
                     RefreshModelsBtn().IsEnabled(false);
                     ModelFetchStatusText().Visibility(mux::Visibility::Visible);
-                    ModelFetchStatusText().Text(L"Fetching models…");
+                    ModelFetchStatusText().Text(L"正在获取模型…");
 
                     auto dispatcher = this->DispatcherQueue();
                     std::thread([cfg, dispatcher,
@@ -81,7 +85,7 @@ namespace winrt::Gridex::implementation
                             if (!res.success)
                             {
                                 self->ModelFetchStatusText().Text(
-                                    winrt::hstring(L"Fetch failed: " + res.errorMessage));
+                                    winrt::hstring(L"获取失败：" + res.errorMessage));
                                 return;
                             }
 
@@ -115,8 +119,8 @@ namespace winrt::Gridex::implementation
                             if (!matched) self->ModelBox().Text(winrt::hstring(keep));
 
                             self->ModelFetchStatusText().Text(
-                                winrt::hstring(L"Loaded " +
-                                    std::to_wstring(res.models.size()) + L" models."));
+                                winrt::hstring(L"已加载 " +
+                                    std::to_wstring(res.models.size()) + L" 个模型。"));
                         });
                     }).detach();
                 });
@@ -165,7 +169,7 @@ namespace winrt::Gridex::implementation
                 [this](winrt::Windows::Foundation::IInspectable const&, mux::RoutedEventArgs const&)
                 {
                     CheckUpdateButton().IsEnabled(false);
-                    UpdateStatusText().Text(L"Checking...");
+                    UpdateStatusText().Text(L"正在检查...");
 
                     auto dispatcher = this->DispatcherQueue();
                     auto xamlRoot   = this->XamlRoot();
@@ -179,13 +183,13 @@ namespace winrt::Gridex::implementation
 
                                 if (!r.errorMessage.empty())
                                 {
-                                    UpdateStatusText().Text(winrt::hstring(L"Error: " + r.errorMessage));
+                                    UpdateStatusText().Text(winrt::hstring(L"错误：" + r.errorMessage));
                                     return;
                                 }
                                 if (!r.hasUpdate)
                                 {
                                     UpdateStatusText().Text(
-                                        winrt::hstring(L"You're on the latest version (" + r.currentVersion + L")."));
+                                        winrt::hstring(L"已是最新版本（" + r.currentVersion + L"）。"));
                                     return;
                                 }
 
@@ -194,13 +198,13 @@ namespace winrt::Gridex::implementation
                                                    L"\nNew:     " + r.newVersion +
                                                    L"\n\nDownload and install now? The app will restart.";
                                 UpdateStatusText().Text(
-                                    winrt::hstring(L"Update available: " + r.newVersion));
+                                    winrt::hstring(L"有可用更新：" + r.newVersion));
 
                                 muxc::ContentDialog dlg;
-                                dlg.Title(winrt::box_value(winrt::hstring(L"Update Available")));
+                                dlg.Title(winrt::box_value(winrt::hstring(L"有可用更新")));
                                 dlg.Content(winrt::box_value(winrt::hstring(msg)));
-                                dlg.PrimaryButtonText(L"Install");
-                                dlg.CloseButtonText(L"Later");
+                                dlg.PrimaryButtonText(L"安装");
+                                dlg.CloseButtonText(L"稍后");
                                 dlg.DefaultButton(muxc::ContentDialogButton::Primary);
                                 dlg.XamlRoot(xamlRoot);
 
@@ -214,7 +218,7 @@ namespace winrt::Gridex::implementation
                                     dispatcher.TryEnqueue([this]()
                                     {
                                         CheckUpdateButton().IsEnabled(false);
-                                        UpdateStatusText().Text(L"Downloading update...");
+                                        UpdateStatusText().Text(L"正在下载更新...");
                                     });
 
                                     ::Gridex::DownloadAndApplyAsync(
@@ -230,7 +234,7 @@ namespace winrt::Gridex::implementation
                                             dispatcher.TryEnqueue([this, err]()
                                             {
                                                 CheckUpdateButton().IsEnabled(true);
-                                                UpdateStatusText().Text(winrt::hstring(L"Update failed: " + err));
+                                                UpdateStatusText().Text(winrt::hstring(L"更新失败：" + err));
                                             });
                                         });
                                 });
@@ -273,6 +277,8 @@ namespace winrt::Gridex::implementation
         auto s = DBModels::AppSettings::Load();
         s.themeIndex         = ThemeCombo().SelectedIndex();
         s.aiProviderIndex    = AiProviderCombo().SelectedIndex();
+        s.anthropicEndpoint  = std::wstring(AnthropicEndpointBox().Text());
+        s.openaiEndpoint     = std::wstring(OpenAIEndpointBox().Text());
         s.aiApiKey           = std::wstring(ApiKeyBox().Password());
         // ModelBox is an editable ComboBox; .Text returns whatever the
         // user has in the edit field — a picked list item or a freely
@@ -286,11 +292,11 @@ namespace winrt::Gridex::implementation
 
         muxc::ContentDialog dialog;
         dialog.Title(winrt::box_value(winrt::hstring(
-            ok ? L"Settings Saved" : L"Save Failed")));
+            ok ? L"设置已保存" : L"保存失败")));
         dialog.Content(winrt::box_value(winrt::hstring(
-            ok ? L"Settings have been saved."
-               : L"Could not write to settings file.")));
-        dialog.CloseButtonText(L"OK");
+            ok ? L"设置已保存。"
+               : L"无法写入设置文件。")));
+        dialog.CloseButtonText(L"确定");
         dialog.XamlRoot(this->XamlRoot());
         dialog.ShowAsync();
     }

@@ -28,19 +28,19 @@
             <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
                 <Button x:Name="HomeBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Back to Connections (Ctrl+H)">
+                        ToolTipService.ToolTip="返回连接（Ctrl+H）">
                     <FontIcon Glyph="&#xE80F;" FontSize="14" />
                 </Button>
                 <Button x:Name="SidebarToggleBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Toggle Sidebar">
+                        ToolTipService.ToolTip="切换侧边栏">
                     <FontIcon Glyph="&#xE700;" FontSize="14" />
                 </Button>
 
                 <!-- Database Picker (dynamically populated) -->
                 <DropDownButton x:Name="DbPickerButton" Padding="6,4"
                                 Background="Transparent" BorderThickness="0"
-                                ToolTipService.ToolTip="Switch Database">
+                                ToolTipService.ToolTip="切换数据库">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <FontIcon Glyph="&#xEDA2;" FontSize="13" />
                         <TextBlock x:Name="DbPickerText" Text="app_db" FontSize="12" />
@@ -66,12 +66,12 @@
                 <!-- Group 1: Backup / Restore -->
                 <Button x:Name="DumpBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Dump Database">
+                        ToolTipService.ToolTip="导出数据库">
                     <FontIcon Glyph="&#xE74E;" FontSize="14" />
                 </Button>
                 <Button x:Name="RestoreBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Restore Database">
+                        ToolTipService.ToolTip="恢复数据库">
                     <FontIcon Glyph="&#xE777;" FontSize="14" />
                 </Button>
 
@@ -81,7 +81,7 @@
                 <!-- Group 2: Schema visualization -->
                 <Button x:Name="ERDiagramBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="ER Diagram (current schema)">
+                        ToolTipService.ToolTip="ER 图（当前模式）">
                     <FontIcon Glyph="&#xF169;" FontSize="14" />
                 </Button>
 
@@ -91,12 +91,12 @@
                 <!-- Group 3: UI toggles + app settings -->
                 <Button x:Name="DetailsToggleBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Toggle Details Panel">
+                        ToolTipService.ToolTip="切换详情面板">
                     <FontIcon Glyph="&#xE146;" FontSize="14" />
                 </Button>
                 <Button x:Name="SettingsBtn" Width="32" Height="32" Padding="0"
                         Background="Transparent" BorderThickness="0"
-                        ToolTipService.ToolTip="Settings (Ctrl+Shift+P)">
+                        ToolTipService.ToolTip="设置（Ctrl+Shift+P）">
                     <FontIcon Glyph="&#xE713;" FontSize="14" />
                 </Button>
             </StackPanel>
@@ -147,7 +147,7 @@
                         <FontIcon Glyph="&#xE8F1;" FontSize="48"
                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                                   HorizontalAlignment="Center" />
-                        <TextBlock Text="Select a table or run a query"
+                        <TextBlock Text="选择表或执行查询"
                                    FontSize="14"
                                    HorizontalAlignment="Center"
                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
@@ -172,7 +172,7 @@
                                           Width="40" Height="40"
                                           HorizontalAlignment="Center" />
                             <TextBlock x:Name="DataLoadingText"
-                                       Text="Loading table..."
+                                       Text="正在加载表..."
                                        FontSize="13"
                                        Opacity="0.7"
                                        HorizontalAlignment="Center" />
@@ -203,7 +203,7 @@
                                               Width="48" Height="48"
                                               HorizontalAlignment="Center" />
                                 <TextBlock x:Name="ERDiagramLoadingText"
-                                           Text="Generating ER diagram..."
+                                           Text="正在生成 ER 图..."
                                            FontSize="14"
                                            Opacity="0.7"
                                            HorizontalAlignment="Center" />
@@ -224,13 +224,13 @@
                                     <Button x:Name="ERZoomOutBtn"
                                             Width="28" Height="28" Padding="0"
                                             Background="Transparent" BorderThickness="0"
-                                            ToolTipService.ToolTip="Zoom Out">
+                                            ToolTipService.ToolTip="缩小">
                                         <FontIcon Glyph="&#xE71F;" FontSize="12" />
                                     </Button>
                                     <Button x:Name="ERZoomLabelBtn"
                                             MinWidth="48" Height="28" Padding="4,0"
                                             Background="Transparent" BorderThickness="0"
-                                            ToolTipService.ToolTip="Reset Zoom (100%)">
+                                            ToolTipService.ToolTip="重置缩放（100%）">
                                         <TextBlock x:Name="ERZoomLabel"
                                                    Text="100%" FontSize="11"
                                                    TextAlignment="Center" />
@@ -238,7 +238,7 @@
                                     <Button x:Name="ERZoomInBtn"
                                             Width="28" Height="28" Padding="0"
                                             Background="Transparent" BorderThickness="0"
-                                            ToolTipService.ToolTip="Zoom In">
+                                            ToolTipService.ToolTip="放大">
                                         <FontIcon Glyph="&#xE71E;" FontSize="12" />
                                     </Button>
                                     <Border Width="1" Height="20" Margin="2,0"
@@ -246,13 +246,13 @@
                                     <Button x:Name="ERResetLayoutBtn"
                                             Width="28" Height="28" Padding="0"
                                             Background="Transparent" BorderThickness="0"
-                                            ToolTipService.ToolTip="Reset Table Positions">
+                                            ToolTipService.ToolTip="重置表位置">
                                         <FontIcon Glyph="&#xE72C;" FontSize="12" />
                                     </Button>
                                     <Button x:Name="ERFullscreenBtn"
                                             Width="28" Height="28" Padding="0"
                                             Background="Transparent" BorderThickness="0"
-                                            ToolTipService.ToolTip="Toggle Fullscreen">
+                                            ToolTipService.ToolTip="切换全屏">
                                         <FontIcon x:Name="ERFullscreenIcon"
                                                   Glyph="&#xE740;" FontSize="12" />
                                     </Button>
@@ -261,8 +261,8 @@
                         </Grid>
                         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8"
                                     HorizontalAlignment="Right" Padding="12,8">
-                            <Button x:Name="ERExportPngBtn" Content="Export PNG..."
-                                    ToolTipService.ToolTip="Save the diagram as a PNG image" />
+                                <Button x:Name="ERExportPngBtn" Content="导出 PNG..."
+                                    ToolTipService.ToolTip="将图表保存为 PNG 图片" />
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -291,13 +291,13 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Query Log" FontSize="11" FontWeight="SemiBold"
+                        <TextBlock Text="查询日志" FontSize="11" FontWeight="SemiBold"
                                    VerticalAlignment="Center"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <Button x:Name="ClearLogBtn" Grid.Column="1"
-                                Padding="6,2" FontSize="10"
-                                Background="Transparent" BorderThickness="0"
-                                Content="Clear" />
+                            Padding="6,2" FontSize="10"
+                            Background="Transparent" BorderThickness="0"
+                            Content="清空" />
                     </Grid>
 
                     <ScrollViewer Grid.Row="2" x:Name="QueryLogScroller"
@@ -327,9 +327,9 @@
 
                     <!-- Data | Structure toggle -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="0">
-                        <ToggleButton x:Name="DataToggle" Content="Data"
+                        <ToggleButton x:Name="DataToggle" Content="数据"
                                       IsChecked="True" Padding="10,4" />
-                        <ToggleButton x:Name="StructureToggle" Content="Structure"
+                        <ToggleButton x:Name="StructureToggle" Content="结构"
                                       Padding="10,4" />
                     </StackPanel>
 
@@ -337,10 +337,10 @@
                     <Button x:Name="AddRowBtn" Grid.Column="1" Margin="8,0,0,0"
                             Padding="6,4"
                             Background="Transparent" BorderThickness="0"
-                            ToolTipService.ToolTip="Add Row">
+                            ToolTipService.ToolTip="添加行">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <FontIcon Glyph="&#xE710;" FontSize="10" />
-                            <TextBlock Text="Row" FontSize="11" />
+                            <TextBlock Text="行" FontSize="11" />
                         </StackPanel>
                     </Button>
 
@@ -349,15 +349,15 @@
                                 VerticalAlignment="Center">
                         <Button x:Name="PrevPageBtn" Width="24" Height="24" Padding="0"
                                 Background="Transparent" BorderThickness="0"
-                                ToolTipService.ToolTip="Previous Page">
+                                ToolTipService.ToolTip="上一页">
                             <FontIcon Glyph="&#xE76B;" FontSize="10" />
                         </Button>
-                        <TextBlock x:Name="PaginationText" Text="0 rows"
+                        <TextBlock x:Name="PaginationText" Text="0 行"
                                    FontSize="11" VerticalAlignment="Center"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         <Button x:Name="NextPageBtn" Width="24" Height="24" Padding="0"
                                 Background="Transparent" BorderThickness="0"
-                                ToolTipService.ToolTip="Next Page">
+                                ToolTipService.ToolTip="下一页">
                             <FontIcon Glyph="&#xE76C;" FontSize="10" />
                         </Button>
                     </StackPanel>
@@ -369,9 +369,9 @@
                         <TextBlock x:Name="PendingCountText" FontSize="11"
                                    VerticalAlignment="Center"
                                    Foreground="Orange" />
-                        <Button x:Name="DiscardBtn" Content="Discard"
+                        <Button x:Name="DiscardBtn" Content="放弃"
                                 Padding="6,2" FontSize="11" />
-                        <Button x:Name="CommitBottomBtn" Content="Commit"
+                        <Button x:Name="CommitBottomBtn" Content="提交"
                                 Padding="6,2" FontSize="11"
                                 Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>
@@ -380,10 +380,10 @@
                     <Button x:Name="FilterToggleBtn" Grid.Column="5" Margin="8,0,0,0"
                             Padding="6,4"
                             Background="Transparent" BorderThickness="0"
-                            ToolTipService.ToolTip="Toggle Filters">
+                            ToolTipService.ToolTip="切换筛选器">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <FontIcon Glyph="&#xE71C;" FontSize="10" />
-                            <TextBlock Text="Filters" FontSize="11" />
+                            <TextBlock Text="筛选器" FontSize="11" />
                         </StackPanel>
                     </Button>
                 </Grid>

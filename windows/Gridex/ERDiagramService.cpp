@@ -241,7 +241,7 @@ namespace DBModels
         if (!ok)
         {
             CloseHandle(rdErr);
-            stderrOut = L"Failed to launch d2.exe: " +
+            stderrOut = L"无法启动 d2.exe：" +
                 std::to_wstring(GetLastError());
             return -1;
         }
@@ -289,7 +289,7 @@ namespace DBModels
         try { tables = adapter->listTables(schema); }
         catch (...) { return L""; }
 
-        report(L"Found " + std::to_wstring(tables.size()) + L" tables in " + schema);
+        report(L"在 " + schema + L" 中找到 " + std::to_wstring(tables.size()) + L" 张表");
 
         // Build set of sanitized table names so we can skip orphan FKs
         std::set<std::wstring> tableNameSet;
@@ -352,8 +352,8 @@ namespace DBModels
             }
         }
 
-        report(L"Generated " + std::to_wstring(tables.size()) +
-            L" tables, " + std::to_wstring(relCount) + L" relationships");
+        report(L"已生成 " + std::to_wstring(tables.size()) +
+            L" 张表、" + std::to_wstring(relCount) + L" 条关系");
 
         return ss.str();
     }
@@ -424,7 +424,7 @@ namespace DBModels
 
         if (!adapter || !adapter->isConnected())
         {
-            result.error = L"Not connected";
+            result.error = L"未连接";
             return result;
         }
 
@@ -432,11 +432,11 @@ namespace DBModels
         try { tables = adapter->listTables(schema); }
         catch (...)
         {
-            result.error = L"Could not list tables";
+            result.error = L"无法列出表";
             return result;
         }
 
-        report(L"Found " + std::to_wstring(tables.size()) + L" tables in " + schema);
+        report(L"在 " + schema + L" 中找到 " + std::to_wstring(tables.size()) + L" 张表");
 
         std::wstringstream ss;
         ss << L"{\"tables\":[";
@@ -518,8 +518,8 @@ namespace DBModels
         }
         ss << L"]}";
 
-        report(L"Generated " + std::to_wstring(tables.size()) +
-            L" tables, " + std::to_wstring(relCount) + L" relationships");
+        report(L"已生成 " + std::to_wstring(tables.size()) +
+            L" 张表、" + std::to_wstring(relCount) + L" 条关系");
         result.jsonText = ss.str();
         result.tableCount = static_cast<int>(tables.size());
         result.relationshipCount = relCount;
@@ -539,7 +539,7 @@ namespace DBModels
 
         if (!adapter || !adapter->isConnected())
         {
-            result.error = L"Not connected";
+            result.error = L"未连接";
             return result;
         }
 
@@ -547,7 +547,7 @@ namespace DBModels
         result.d2Text = GenerateD2Text(adapter, schema, progress);
         if (result.d2Text.empty())
         {
-            result.error = L"No tables found in schema";
+            result.error = L"模式中未找到表";
             return result;
         }
 
@@ -572,17 +572,17 @@ namespace DBModels
         std::wstring d2Exe = LocateD2Exe();
         if (d2Exe.empty())
         {
-            result.error = L"d2.exe not found. Place it in Assets\\d2\\d2.exe.";
+            result.error = L"未找到 d2.exe。请将其放到 Assets\\d2\\d2.exe。";
             return result;
         }
-        report(L"Using d2.exe at: " + d2Exe);
+        report(L"正在使用 d2.exe：" + d2Exe);
 
         // 3. Write D2 text to temp file (UTF-8)
         std::wstring inputPath = TempPath(L"d2");
         std::wstring outputPath = TempPath(L"svg");
         if (inputPath.empty() || outputPath.empty())
         {
-            result.error = L"Cannot create temp files";
+            result.error = L"无法创建临时文件";
             return result;
         }
 
@@ -590,7 +590,7 @@ namespace DBModels
             std::ofstream f(inputPath, std::ios::binary);
             if (!f.is_open())
             {
-                result.error = L"Cannot write D2 input file";
+                result.error = L"无法写入 D2 输入文件";
                 return result;
             }
             auto utf8 = toUtf8(result.d2Text);
@@ -598,14 +598,14 @@ namespace DBModels
         }
 
         // 4. Run d2.exe
-        report(L"Running d2.exe...");
+        report(L"正在运行 d2.exe...");
         std::wstring stderrOut;
         int exitCode = RunD2(d2Exe, inputPath, outputPath, stderrOut);
 
         if (exitCode != 0)
         {
-            result.error = L"d2.exe failed (exit " + std::to_wstring(exitCode) +
-                L"):\n" + stderrOut;
+            result.error = L"d2.exe 失败（退出码 " + std::to_wstring(exitCode) +
+                L"）：\n" + stderrOut;
             DeleteFileW(inputPath.c_str());
             return result;
         }
@@ -615,7 +615,7 @@ namespace DBModels
         if (outAttrs == INVALID_FILE_ATTRIBUTES ||
             (outAttrs & FILE_ATTRIBUTE_DIRECTORY))
         {
-            result.error = L"d2.exe did not produce SVG output";
+            result.error = L"d2.exe 未生成 SVG 输出";
             DeleteFileW(inputPath.c_str());
             return result;
         }
@@ -623,7 +623,7 @@ namespace DBModels
         // SVG goes to WebView2 — no post-processing needed (browser renders text fine).
         result.svgPath = outputPath;
         result.success = true;
-        report(L"SVG ready at " + outputPath);
+        report(L"SVG 已就绪：" + outputPath);
 
         // Keep input D2 file for debugging? Delete to be tidy.
         DeleteFileW(inputPath.c_str());

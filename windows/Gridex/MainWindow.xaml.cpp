@@ -286,3 +286,4 @@ namespace winrt::Gridex::implementation
         catch (...) { /* best effort; never block app on dialog failures */ }
     }
 }
+}

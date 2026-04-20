@@ -28,6 +28,8 @@
 #include <ShlObj.h>
 #include <wincrypt.h>
 #include <chrono>
+#include <sstream>
+#include <fstream>
 #include <fstream>
 #include <thread>
 #if __has_include("WorkspacePage.g.cpp")
